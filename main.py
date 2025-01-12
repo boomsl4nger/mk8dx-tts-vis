@@ -68,11 +68,11 @@ def basic_analysis(data: DataFrame):
     print("\nDescriptive statistics:")
     print(data.describe())
 
-def create_timesheet_df(pbs: list, wrs: list, standards: DataFrame):
+def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame):
     pass
 
 if __name__ in "__main__":
-    standards_150 = pd.read_csv("150cc_standards.csv")
     times_150 = pd.read_csv("150cc_times.csv")
-    wrs_150 = fetch_wrs("150")
+    wrs_150 = pd.read_csv("150cc_wrs_12_01_2025.csv")
+    standards_150 = pd.read_csv("150cc_standards.csv")
     timesheet = create_timesheet_df(times_150, wrs_150, standards_150)
