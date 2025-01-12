@@ -24,3 +24,9 @@ TODO:
 - Front-end libraries for things like data tables, interactive graphs, templates, navigating pages, etc.
 - SQLite for database, design schemas, libraries for interaction with web app
 - Update tracking + visualisations
+
+## Requirements
+TODO
+
+## References
+TODO
