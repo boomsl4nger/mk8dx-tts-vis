@@ -101,6 +101,3 @@ class TrackTime:
 
     def __repr__(self):
         return f"TrackTime({self})"
-    
-    def __hash__(self):
-        return self.time.__hash__()

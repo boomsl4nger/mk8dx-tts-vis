@@ -2,13 +2,16 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import seaborn as sns
 from typing import Literal
 
 from outreach import fetch_wrs
 from timeformat import TrackTime
 
+pd.set_option('display.max_rows', 20)
+pd.set_option('display.max_columns', 20)
+pd.set_option('display.width', 0)
 sns.set_theme(style="whitegrid")
 
 STANDARDS_150 = pd.read_csv("data/150cc_standards.csv")
@@ -74,6 +77,9 @@ def basic_analysis(data: DataFrame, verbose: bool = False):
         print("\nDescriptive statistics:")
         print(data.describe())
 
+def update_wr_csv():
+    pass
+
 def determine_standard_and_diff(track_no: int, time: TrackTime, 
     standards: DataFrame | None = None) -> tuple[str, TrackTime]:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
@@ -113,9 +119,8 @@ def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | N
     - Standard: rank name based on the given standard cut-offs
     - StandardDiff: difference between the next standard and the user time
     - WR: given world record
-    - Diff: time - wr
-    - DiffNormWR: diff / wr * 100
-    - DiffNormPB: diff / time * 100
+    - WRDiff: time - wr
+    - WRDiffNorm: diff / wr * 100
     - [Name]Num: numerical version of TrackTime columns for plotting purposes
 
     Args:
@@ -127,8 +132,8 @@ def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | N
     Returns:
         DataFrame: Filled timesheet.
     """
-    col_names = ["TrackNo", "TrackName", "Time", "Standard", "StandardDiff", "WR", 
-                 "WRDiff", "WRDiffNormWR", "WRDiffNormPB",
+    col_names = ["TrackNo", "TrackName", "Time", "Standard", "StandardDiff",
+                 "WR", "WRDiff", "WRDiffNorm",
                  "TimeNum", "StandardDiffNum", "WRNum", "WRDiffNum"]
     timesheet = []
     for track_no in range(len(pbs)):
@@ -143,11 +148,69 @@ def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | N
 
         timesheet.append([
             track_no + 1, name, time, standard, stnd_diff, wr, wr_diff, 
-            wr_diff.get_seconds() / wr.get_seconds() * 100, wr_diff.get_seconds() / time.get_seconds() * 100,
+            wr_diff.get_seconds() / wr.get_seconds() * 100,
             time.get_seconds(), stnd_diff.get_seconds(), wr.get_seconds(), wr_diff.get_seconds()
         ])
 
     return DataFrame(timesheet, columns=col_names)
+
+def check_col_numeric(name: str) -> bool:
+    """Check if a given column name for a timesheet is numeric.
+
+    Args:
+        name (str): column name.
+
+    Returns:
+        bool: true if a valid name, otherwise false.
+    """
+    valid = ["TimeNum", "StandardDiffNum", "WRNum", "WRDiffNum", "WRDiffNorm"]
+    return name in valid
+
+def top_n_times(timesheet: DataFrame, n: int = 10, bottom: bool = False, col: str = "TimeNum") -> DataFrame:
+    """Sorts a given timesheet based on some criteria.
+
+    Args:
+        timesheet (DataFrame): The timesheet of interest.
+        n (int, optional): Number of entries to show. Defaults to 10.
+        bottom (bool, optional): If true, sort in descending order. Defaults to False.
+        col (str, optional): Column name to sort by. Defaults to "TimeNum".
+
+    Raises:
+        ValueError: If column name is invalid.
+
+    Returns:
+        DataFrame: Sorted and reduced timesheet.
+    """
+    if not check_col_numeric(col):
+        raise ValueError("Column name needs to be numeric to sort.")
+    return timesheet.sort_values(by=col, ascending=(not bottom)).iloc[:n]
+
+def calculate_sheet_stats(timesheet: DataFrame, verbose: bool = False) -> Series:
+    """Calculates various statistics for a given timesheet, such as for the WRDiff column.
+
+    Args:
+        timesheet (DataFrame): The timesheet.
+        verbose (bool, optional): If true, prints results. Defaults to False.
+
+    Returns:
+        dict: The statistics of interest.
+    """
+    to_describe = ["WRDiffNum", "WRDiffNorm"]
+    stats = timesheet[to_describe].describe()
+
+    if verbose:
+        print(stats)
+
+    return stats
+
+def create_visuals(timesheet: DataFrame):
+    """Create some visualisations for a timesheet. Mainly for testing plots.
+
+    Args:
+        timesheet (DataFrame): Given timesheet.
+    """
+    sns.histplot(data=timesheet, x="WRDiffNum", binwidth=1.0, binrange=(2.0, 8.0))
+    plt.show()
 
 if __name__ in "__main__":
     # Create timesheet
@@ -156,6 +219,8 @@ if __name__ in "__main__":
     timesheet = create_timesheet_df(times_150, wrs_150)
 
     # Do stuff with it
+    # print(timesheet.head(10))
     basic_analysis(timesheet)
-    sns.histplot(data=timesheet, x="TimeNum")
-    plt.show()
+    # print(top_n_times(timesheet, col="WRDiffNorm", n=15, bottom=False))
+    # calculate_sheet_stats(timesheet)
+    # create_visuals(timesheet)
