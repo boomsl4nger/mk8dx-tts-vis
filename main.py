@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -77,8 +78,23 @@ def basic_analysis(data: DataFrame, verbose: bool = False):
         print("\nDescriptive statistics:")
         print(data.describe())
 
-def update_wr_csv():
-    pass
+def update_wr_csv(cc: Literal["150", "200"] = "150", path: str = None):
+    """Updates the current WR CSV file by pulling the latest times and saving to a new file. If no
+    filename is given, creates one by default with the format:
+    - `[cc]_wrs_[DD_MM_YYYY].csv`
+
+    Useful reference: https://strftime.org/
+
+    Args:
+        cc (str, optional): CC for WRs. Defaults to 150cc.
+        path (str, optional): File path to use when writing. Defaults to None.
+    """
+    if path is None:
+        date_part = datetime.now().strftime("%d_%m_%Y")
+        path = f"data/{cc}cc_wrs_{date_part}.csv"
+
+    times = DataFrame(fetch_wrs(cc))
+    times.to_csv(path, header=False, index=False)
 
 def determine_standard_and_diff(track_no: int, time: TrackTime, 
     standards: DataFrame | None = None) -> tuple[str, TrackTime]:
@@ -214,8 +230,8 @@ def create_visuals(timesheet: DataFrame):
 
 if __name__ in "__main__":
     # Create timesheet
-    times_150 = pd.read_csv("data/150cc_times.csv")
-    wrs_150 = pd.read_csv("data/150cc_wrs_12_01_2025.csv")
+    times_150 = pd.read_csv("data/150cc_times.csv", header=None)
+    wrs_150 = pd.read_csv("data/150cc_wrs_23_01_2025.csv", header=None)
     timesheet = create_timesheet_df(times_150, wrs_150)
 
     # Do stuff with it
