@@ -17,6 +17,11 @@ sns.set_theme(style="whitegrid")
 
 STANDARDS_150 = pd.read_csv("data/150cc_standards.csv")
 STANDARDS_200 = None
+STANDARDS_NAMES = [
+        'God', 'Myth A', 'Myth B', 'Myth C', 'Titan A', 'Titan B', 'Titan C', 
+        'Hero A', 'Hero B', 'Hero C', 'Exp A', 'Exp B', 'Exp C', 'Adv A', 'Adv B', 'Adv C', 
+        'Int A', 'Int B', 'Int C', 'Beg A', 'Beg B', 'Beg C'
+    ]
 
 def raw_to_csv(input_filename: str, output_filename: str):
     """Converts a text file with track times to CSV. Text file format should be tab separated, such
@@ -213,20 +218,50 @@ def calculate_sheet_stats(timesheet: DataFrame, verbose: bool = False) -> Series
     """
     to_describe = ["WRDiffNum", "WRDiffNorm"]
     stats = timesheet[to_describe].describe()
+    # timesheet.agg(["mean", "median", "std"])
 
     if verbose:
         print(stats)
 
     return stats
 
-def create_visuals(timesheet: DataFrame):
+def create_visuals_overall(timesheet: DataFrame):
     """Create some visualisations for a timesheet. Mainly for testing plots.
+
+    For inspo: https://seaborn.pydata.org/examples/index.html
 
     Args:
         timesheet (DataFrame): Given timesheet.
     """
+    # Histogram of WR diffs
     sns.histplot(data=timesheet, x="WRDiffNum", binwidth=1.0, binrange=(2.0, 8.0))
+    plt.xlabel("WR Diff (s)")
+    plt.ylabel("Count")
     plt.show()
+
+    # Histogram of WR diffs normed
+    sns.histplot(data=timesheet, x="WRDiffNorm", stat="percent")
+    plt.xlabel("WR Diff Norm (%)")
+    plt.ylabel("Percent")
+    plt.show()
+
+    # Bar chart of standard counts
+    name_counts = {}
+    for name in STANDARDS_NAMES:
+        name_counts[name] = 0
+
+    for name in timesheet["Standard"]:
+        name_counts[name] += 1
+
+    name_counts = Series(name_counts)
+    print(name_counts.head(20))
+    sns.barplot(data=name_counts, order=STANDARDS_NAMES, orient="y", palette="rocket")
+    plt.xlabel("Count")
+    # plt.ylabel("Standard Name")
+    plt.show()
+
+def create_visuals_track(timesheet: DataFrame, track_name: str):
+    pass
 
 if __name__ in "__main__":
     # Create timesheet
@@ -236,7 +271,7 @@ if __name__ in "__main__":
 
     # Do stuff with it
     # print(timesheet.head(10))
-    basic_analysis(timesheet)
-    # print(top_n_times(timesheet, col="WRDiffNorm", n=15, bottom=False))
-    # calculate_sheet_stats(timesheet)
-    # create_visuals(timesheet)
+    # basic_analysis(timesheet)
+    # print(top_n_times(timesheet, col="WRDiffNum", n=15, bottom=False))
+    # calculate_sheet_stats(timesheet, verbose=True)
+    create_visuals_overall(timesheet)
