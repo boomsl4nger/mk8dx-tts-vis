@@ -67,6 +67,9 @@ class TrackTime:
             float: time in seconds
         """
         return self.time.seconds + self.time.microseconds / 1e6
+    
+    def get_timedelta(self):
+        return self.time
 
     def __add__(self, other):
         other = self._ensure_track_time(other)

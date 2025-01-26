@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -15,14 +16,19 @@ pd.set_option('display.max_columns', 20)
 pd.set_option('display.width', 0)
 sns.set_theme(style="whitegrid")
 
+# Globals
 STANDARDS_150 = pd.read_csv("data/150cc_standards.csv")
 STANDARDS_200 = None
 STANDARDS_NAMES = [
-        'God', 'Myth A', 'Myth B', 'Myth C', 'Titan A', 'Titan B', 'Titan C', 
-        'Hero A', 'Hero B', 'Hero C', 'Exp A', 'Exp B', 'Exp C', 'Adv A', 'Adv B', 'Adv C', 
-        'Int A', 'Int B', 'Int C', 'Beg A', 'Beg B', 'Beg C'
-    ]
+    'God', 'Myth A', 'Myth B', 'Myth C', 'Titan A', 'Titan B', 'Titan C', 
+    'Hero A', 'Hero B', 'Hero C', 'Exp A', 'Exp B', 'Exp C', 'Adv A', 'Adv B', 'Adv C', 
+    'Int A', 'Int B', 'Int C', 'Beg A', 'Beg B', 'Beg C'
+]
+cmap = matplotlib.colormaps.get_cmap("plasma")
+gradient = np.linspace(0, 1, len(STANDARDS_NAMES))
+STANDARDS_COLOURS = [matplotlib.colors.to_hex(cmap(i)) for i in gradient]
 
+# File functions
 def raw_to_csv(input_filename: str, output_filename: str):
     """Converts a text file with track times to CSV. Text file format should be tab separated, such
     as `track_name \\t track_time`.
@@ -101,6 +107,7 @@ def update_wr_csv(cc: Literal["150", "200"] = "150", path: str = None):
     times = DataFrame(fetch_wrs(cc))
     times.to_csv(path, header=False, index=False)
 
+# Timesheet functions
 def determine_standard_and_diff(track_no: int, time: TrackTime, 
     standards: DataFrame | None = None) -> tuple[str, TrackTime]:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
@@ -135,7 +142,7 @@ def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | N
     
     Timesheet will contain:
     - TrackNo: track number (1-96)
-    - Track: track name
+    - TrackName: track name
     - Time: given user time
     - Standard: rank name based on the given standard cut-offs
     - StandardDiff: difference between the next standard and the user time
@@ -225,6 +232,7 @@ def calculate_sheet_stats(timesheet: DataFrame, verbose: bool = False) -> Series
 
     return stats
 
+# Data visualisation functions
 def create_visuals_overall(timesheet: DataFrame):
     """Create some visualisations for a timesheet. Mainly for testing plots.
 
@@ -260,8 +268,49 @@ def create_visuals_overall(timesheet: DataFrame):
     # plt.ylabel("Standard Name")
     plt.show()
 
-def create_visuals_track(timesheet: DataFrame, track_name: str):
-    pass
+def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_150, track_name: str = None, track_no: int = None):
+    """Create visualisations for a given individual track. Also used for testing mostly. Either the
+    track name or number must be provided.
+
+    See: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.axvspan.html
+    See: https://matplotlib.org/stable/gallery/color/colormap_reference.html
+
+    Args:
+        timesheet (DataFrame): The timesheet.
+        track_name (str, optional): Track name.
+        track_no (int, optional): Track number.
+        standards (DataFrame, optional): Standards for all tracks. Defaults to 150 standards.
+    """
+    if track_name is None and track_no is None:
+        raise ValueError("Need to give either a track name or number, e.g. Mario Kart Stadium (1).")
+
+    # TODO support for track numbers, should infer track name from given number
+
+    track_stats = timesheet.loc[timesheet["TrackName"] == track_name]
+    time_pb = track_stats.loc[:, "Time"].iloc[0].get_seconds()
+    time_wr = track_stats.loc[:, "WR"].iloc[0].get_seconds()
+
+    track_stnds = standards.loc[standards["Track"] == track_name]
+    track_stnds_secs = [TrackTime(i).get_seconds() for i in track_stnds.iloc[0, 1:]]
+
+    # Plot the times as data points
+    sns.stripplot(x=[time_pb, time_wr], jitter=False)
+
+    # Plot the standards as shaded vertical regions
+    track_stnds_secs.extend(list(plt.xlim()))
+    track_stnds_secs = sorted(track_stnds_secs)
+    for i in range(len(track_stnds_secs) - 1):
+        time_1, time_2 = track_stnds_secs[i:i+2]
+        if time_1 > time_pb:
+            plt.xlim(track_stnds_secs[0], time_1)
+            break
+
+        plt.axvspan(time_1, time_2, facecolor=STANDARDS_COLOURS[i], alpha=0.5)
+        plt.text(x=np.mean((time_1, time_2)), y=plt.ylim()[0] - 0.05, s=STANDARDS_NAMES[i], horizontalalignment="center", verticalalignment="bottom", rotation=90) # Kerning here is fucking annoying, maybe x-value
+    
+    plt.xlabel("Time (s)")
+    plt.ylabel(f"{track_name}")
+    plt.show()
 
 if __name__ in "__main__":
     # Create timesheet
@@ -272,6 +321,7 @@ if __name__ in "__main__":
     # Do stuff with it
     # print(timesheet.head(10))
     # basic_analysis(timesheet)
-    # print(top_n_times(timesheet, col="WRDiffNum", n=15, bottom=False))
+    print(top_n_times(timesheet, col="WRDiffNum", n=5, bottom=False))
     # calculate_sheet_stats(timesheet, verbose=True)
-    create_visuals_overall(timesheet)
+    # create_visuals_overall(timesheet)
+    create_visuals_track(timesheet, track_name="Mario Kart Stadium", standards=STANDARDS_150)

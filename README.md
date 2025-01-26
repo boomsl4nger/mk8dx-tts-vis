@@ -1,6 +1,6 @@
 # Mario Kart 8 Deluxe Time Trials Visualiser
 
-Personal project combining my hobby with some data visualisation and analysis. Ideally becomes a web app with all the features I want to implement.
+Personal project combining my hobby with some data visualisation and analysis. Ideally becomes a web app with all the features I want to implement. Back-end basics are mostly done so now want to make a web-app for a decent UI to interact with.
 
 Goals:
 - Set-up a nice way to read and calculate TT time format
@@ -20,6 +20,7 @@ Other misc goals:
 
 TODO:
 - Priority: back-end stuff like parsing and combining data, simple visualisations
+- Support for name abbrevs
 - Flask for web app
 - Front-end libraries for things like data tables, interactive graphs, templates, navigating pages, etc.
 - SQLite for database, design schemas, libraries for interaction with web app
