@@ -16,7 +16,7 @@ pd.set_option('display.max_columns', 20)
 pd.set_option('display.width', 0)
 sns.set_theme(style="whitegrid")
 
-# Globals
+#region Globals
 STANDARDS_150 = pd.read_csv("data/150cc_standards.csv")
 STANDARDS_200 = None
 STANDARDS_NAMES = [
@@ -24,11 +24,14 @@ STANDARDS_NAMES = [
     'Hero A', 'Hero B', 'Hero C', 'Exp A', 'Exp B', 'Exp C', 'Adv A', 'Adv B', 'Adv C', 
     'Int A', 'Int B', 'Int C', 'Beg A', 'Beg B', 'Beg C'
 ]
+
+# See: https://matplotlib.org/stable/gallery/color/colormap_reference.html
 cmap = matplotlib.colormaps.get_cmap("plasma")
 gradient = np.linspace(0, 1, len(STANDARDS_NAMES))
 STANDARDS_COLOURS = [matplotlib.colors.to_hex(cmap(i)) for i in gradient]
+#endregion
 
-# File functions
+#region File functions
 def raw_to_csv(input_filename: str, output_filename: str):
     """Converts a text file with track times to CSV. Text file format should be tab separated, such
     as `track_name \\t track_time`.
@@ -106,8 +109,9 @@ def update_wr_csv(cc: Literal["150", "200"] = "150", path: str = None):
 
     times = DataFrame(fetch_wrs(cc))
     times.to_csv(path, header=False, index=False)
+#endregion
 
-# Timesheet functions
+#region Timesheet functions
 def determine_standard_and_diff(track_no: int, time: TrackTime, 
     standards: DataFrame | None = None) -> tuple[str, TrackTime]:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
@@ -231,8 +235,9 @@ def calculate_sheet_stats(timesheet: DataFrame, verbose: bool = False) -> Series
         print(stats)
 
     return stats
+#endregion
 
-# Data visualisation functions
+#region Data visualisation functions
 def create_visuals_overall(timesheet: DataFrame):
     """Create some visualisations for a timesheet. Mainly for testing plots.
 
@@ -273,7 +278,7 @@ def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_
     track name or number must be provided.
 
     See: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.axvspan.html
-    See: https://matplotlib.org/stable/gallery/color/colormap_reference.html
+    See: https://seaborn.pydata.org/tutorial/properties.html
 
     Args:
         timesheet (DataFrame): The timesheet.
@@ -294,7 +299,7 @@ def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_
     track_stnds_secs = [TrackTime(i).get_seconds() for i in track_stnds.iloc[0, 1:]]
 
     # Plot the times as data points
-    sns.stripplot(x=[time_pb, time_wr], jitter=False)
+    sns.stripplot(x=[time_pb, time_wr], jitter=False, marker="d", size=10, color="k")
 
     # Plot the standards as shaded vertical regions
     track_stnds_secs.extend(list(plt.xlim()))
@@ -311,6 +316,7 @@ def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_
     plt.xlabel("Time (s)")
     plt.ylabel(f"{track_name}")
     plt.show()
+#endregion
 
 if __name__ in "__main__":
     # Create timesheet
@@ -321,7 +327,7 @@ if __name__ in "__main__":
     # Do stuff with it
     # print(timesheet.head(10))
     # basic_analysis(timesheet)
-    print(top_n_times(timesheet, col="WRDiffNum", n=5, bottom=False))
+    print(top_n_times(timesheet, col="WRDiffNorm", n=10, bottom=True))
     # calculate_sheet_stats(timesheet, verbose=True)
     # create_visuals_overall(timesheet)
     create_visuals_track(timesheet, track_name="Mario Kart Stadium", standards=STANDARDS_150)
