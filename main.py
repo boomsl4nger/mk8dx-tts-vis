@@ -325,9 +325,9 @@ if __name__ in "__main__":
     timesheet = create_timesheet_df(times_150, wrs_150)
 
     # Do stuff with it
-    # print(timesheet.head(10))
+    print(timesheet.head(10))
     # basic_analysis(timesheet)
-    print(top_n_times(timesheet, col="WRDiffNorm", n=10, bottom=True))
+    # print(top_n_times(timesheet, col="WRDiffNum", n=10, bottom=False))
     # calculate_sheet_stats(timesheet, verbose=True)
     # create_visuals_overall(timesheet)
-    create_visuals_track(timesheet, track_name="Mario Kart Stadium", standards=STANDARDS_150)
+    # create_visuals_track(timesheet, track_name="Mario Kart Stadium", standards=STANDARDS_150)
