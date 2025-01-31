@@ -7,7 +7,7 @@ Back-end basics are mostly done so now want to make a web-app for a decent UI to
 ## Goals
 - [x] Back-end stuff like parsing and combining data, simple visualisations
 - [ ] Support for name abbrevs
-- [ ] Set-up Flask for a basic web app
+- [x] Set-up Flask for a basic web app
 - [ ] Design pages for different features
 - [ ] SQLite for database, design schemas, libraries for interaction with web app
 - [ ] Front-end libraries for things like data tables, interactive graphs, templates, navigating pages, etc.
