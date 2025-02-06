@@ -8,8 +8,8 @@ from pandas import DataFrame, Series
 import seaborn as sns
 from typing import Literal
 
-from outreach import fetch_wrs
-from timeformat import TrackTime
+from outreach import fetch_wrs_shrooms
+from TrackTime import TrackTime
 
 pd.set_option('display.max_rows', 20)
 pd.set_option('display.max_columns', 20)
@@ -17,6 +17,9 @@ pd.set_option('display.width', 0)
 sns.set_theme(style="whitegrid")
 
 #region Globals
+CC_CATEGORIES = ["150cc", "200cc"]
+ITEM_OPTIONS = ["Shrooms", "NITA"]
+
 STANDARDS_150 = pd.read_csv("data/150cc_standards.csv")
 STANDARDS_200 = None
 STANDARDS_NAMES = [
@@ -92,7 +95,7 @@ def basic_analysis(data: DataFrame, verbose: bool = False):
         print("\nDescriptive statistics:")
         print(data.describe())
 
-def update_wr_csv(cc: Literal["150", "200"] = "150", path: str = None):
+def update_wr_csv(cc: Literal["150cc", "200cc"] = "150cc", path: str = None):
     """Updates the current WR CSV file by pulling the latest times and saving to a new file. If no
     filename is given, creates one by default with the format:
     - `[cc]_wrs_[DD_MM_YYYY].csv`
@@ -105,15 +108,14 @@ def update_wr_csv(cc: Literal["150", "200"] = "150", path: str = None):
     """
     if path is None:
         date_part = datetime.now().strftime("%d_%m_%Y")
-        path = f"data/{cc}cc_wrs_{date_part}.csv"
+        path = f"data/{cc}_wrs_{date_part}.csv"
 
-    times = DataFrame(fetch_wrs(cc))
+    times = DataFrame(fetch_wrs_shrooms(cc))
     times.to_csv(path, header=False, index=False)
 #endregion
 
 #region Timesheet functions
-def determine_standard_and_diff(track_no: int, time: TrackTime, 
-    standards: DataFrame | None = None) -> tuple[str, TrackTime]:
+def determine_standard_and_diff(track_no: int, time: TrackTime, standards: DataFrame | None = None) -> tuple[str, TrackTime]:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
     Mario Kart, standards are usually something like:
     `God > Myth > Titan > Hero > Exp > Adv > Int > Beg`
@@ -319,13 +321,17 @@ def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_
 #endregion
 
 if __name__ in "__main__":
+    # Update WR CSVs
+    # update_wr_csv("150")
+    # update_wr_csv("200")
+
     # Create timesheet
     times_150 = pd.read_csv("data/150cc_times.csv", header=None)
-    wrs_150 = pd.read_csv("data/150cc_wrs_23_01_2025.csv", header=None)
+    wrs_150 = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
     timesheet = create_timesheet_df(times_150, wrs_150)
 
     # Do stuff with it
-    print(timesheet.head(10))
+    # print(timesheet.head(10))
     # basic_analysis(timesheet)
     # print(top_n_times(timesheet, col="WRDiffNum", n=10, bottom=False))
     # calculate_sheet_stats(timesheet, verbose=True)
