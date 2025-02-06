@@ -1,13 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Track Times</title>
-</head>
-<body>
-    <h1>My MK8DX Track Times</h1>
-    <p>This application helps track and visualise Mario Kart 8 Deluxe personal bests.</p>
-    <a href="/timesheet">View Timesheet</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Home - Track Times{% endblock %}
+
+{% block content %}
+    <h1 class="mb-4">My MK8DX Track Times</h1>
+    <p>This application helps track and visualize Mario Kart 8 Deluxe (MK8DX) personal bests.</p>
+
+    <h2>About</h2>
+    <p>This is a personal project to improve my coding skills and visualise my MK8DX times. This web app has a variety of features to help visualise your current PBs and improvements.</p>
+    <p>View your timesheet to see all the tracks in a table format, plus some overall statistics and graphs. Use the update form to add new PBs or remove times. If you can't decide which track to play next, use the Track Picker to randomly choose one based on some criteria.</p>
+    <p>Note that many features will be incomplete, jank, or simply not implemented yet as I am learning :)</p>
+
+    <h2>Links</h2>
+    <p>Shroom WRs are sourced from <a href="https://mkwrs.com/mk8dx/">here</a>.</p>
+    <p>NITA WRs are sourced from <a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRBXBdqpurvBmR--bzj9RJmgr7HxAoWVZmlwmhaBK-LYf_BbXn8iAPdH-ogBtXiAwxlTkQgn45PkeRW/pubhtml">here</a>.</p>
+    <p>MK8DX Records YouTube channel: <a href="https://www.youtube.com/@MK8DXRecords">here</a>.</p>
+    <p>My 150cc Shrooms template: <a href="https://docs.google.com/spreadsheets/d/1CkiNxsTM9PJQPI4yFEQLlBRbYJotVlxwZ7Tu7MqGXRI/">here</a>.</p>
+
+    <h2>Contact Me</h2>
+    <p>If you have suggestions or comments about anything, messaging me on Discord (boomslang5209) is probably best.</p>
+    <p>Visit the source: <a href="https://github.com/boomsl4nger/mk8dx-tts-vis">here</a>.</p>
+{% endblock %}
