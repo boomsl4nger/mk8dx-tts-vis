@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Update Track Time{% endblock %}
+
+{% block content %}
+    <h1>Update PBs</h1>
+    <p>Use the following form to insert a new time into the database.</p>
+
+    <form method="POST" class="mt-3">
+
+        <div class="mb-3">
+            <label for="track" class="form-label">Track:</label>
+            <input list="tracks" name="track" class="form-control" required>
+            <datalist id="tracks">
+                {% for track in track_names %}
+                    <option value="{{ track }}">
+                {% endfor %}
+            </datalist>
+        </div>
+
+        <div class="mb-3">
+            <label for="time" class="form-label">Time (M:SS.sss):</label>
+            <input type="text" name="time" class="form-control" pattern="^\d:\d{2}\.\d{3}$" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="cc" class="form-label">CC:</label>
+            <select name="cc" class="form-select">
+                {% for cc in cc_categories %}
+                    <option value="{{ cc }}">{{ cc }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="items" class="form-label">Items Used:</label>
+            <select name="items" class="form-select">
+                {% for item in item_options %}
+                    <option value="{{ item }}">{{ item }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form>
+{% endblock %}
