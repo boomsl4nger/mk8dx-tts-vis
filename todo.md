@@ -18,7 +18,7 @@ Moved out of the readme.
 - Specific track pages
     - Delete times from DB
 - Home page overhaul
-- Add favicon
+    - Glossary maybe
 
 ## Future considerations
 - Track picker for smart suggestions
