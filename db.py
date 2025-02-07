@@ -126,6 +126,22 @@ def get_tracks() -> tuple:
     """
     return query_db("SELECT * FROM tracks ORDER BY tr_number")
 
+def get_recent_times(n: str) -> tuple:
+    """Gets the n most recent additions to the track_times table.
+
+    Args:
+        n (str): Number of entries to get.
+
+    Returns:
+        tuple: Tuple containing Row objects from the db.
+    """
+    query = """
+        SELECT * FROM track_times
+        ORDER BY id DESC
+        LIMIT ?
+    """
+    return query_db(query, (n,))
+
 def get_best_times(cc: str, items: str) -> tuple:
     """Gets the current PBs from the times table in the db, for a given CC and item type.
 
@@ -158,3 +174,4 @@ if __name__ in "__main__":
 
     # Otherwise, used for debugging stuff
     # print([row["time_str"] for row in get_best_times("150cc", "Shrooms")])
+    # print([[j for j in i] for i in get_recent_times(n="10")])

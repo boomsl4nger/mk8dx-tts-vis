@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, flash, redirect, render_template, request, url_for
 from markupsafe import escape
 import pandas as pd
 
@@ -6,6 +6,9 @@ import db
 from timesheet import CC_CATEGORIES, ITEM_OPTIONS, create_timesheet_df
 
 app = Flask(__name__)
+
+TRACKS = [(row["tr_name"], row["tr_abbrev"]) for row in db.get_tracks()]
+TRACK_NAMES = [i[0] for i in TRACKS]
 
 # Ideally WRs are scraped from the site on demand, but this is easier for now
 wrs_150_shrooms = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
@@ -42,10 +45,20 @@ def update():
         time = request.form["time"]
         cc = request.form["cc"]
         items = request.form["items"]
-        db.insert_time(track, time, cc, items)
 
-    track_names = [row[3] for row in db.get_tracks()]
-    return render_template("update.html", track_names=track_names, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
+        if track not in TRACK_NAMES: # Validate track exists
+            # This flash call actually won't work I think
+            flash("Interal error: invalid track name", "danger")
+            return redirect(url_for("update"))
+
+        db.insert_time(track, time, cc, items)
+        return redirect(url_for("update", success=True))
+
+    recent_times = db.get_recent_times("10")
+
+    return render_template("update.html",
+        track_names=TRACKS, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS,
+        recent_times=recent_times)
 
 @app.route("/picker")
 def picker():
