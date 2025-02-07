@@ -11,6 +11,7 @@ Next goal is to improve the templates to be more user-friendly and customisable.
 - [x] Set up SQLite for database, design schemas
 - [ ] Design pages for different features using Bootstrap
 - [ ] Front-end libraries for things like data tables, interactive graphs, templates
+- [ ] Testing, better input validation, error handling, etc.
 
 ## Overview
 The application is built using Flask, which is run with the following command:

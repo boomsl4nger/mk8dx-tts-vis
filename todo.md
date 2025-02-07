@@ -2,8 +2,8 @@
 Moved out of the readme.
 
 ## Main TODO
-- Support for track name abbreviations (e.g., MKS = Mario Kart Stadium)
 - Support for 200cc times
+- Support for NITA WRs
 - Timesheet improvements
     - Colours for standards and WR diffs
     - Sorting for numeric columns (and maybe others)
