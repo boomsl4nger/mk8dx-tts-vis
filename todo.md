@@ -13,8 +13,7 @@ Moved out of the readme.
     - Toggle to remove columns (num columns, standards)
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
-    - More column in recent table, add track links
-    - Delete recent time from table
+    - Add track links in recent table
 - Specific track pages
     - Delete times from DB
 - Home page overhaul

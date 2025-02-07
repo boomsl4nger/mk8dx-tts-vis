@@ -136,11 +136,24 @@ def get_recent_times(n: str) -> tuple:
         tuple: Tuple containing Row objects from the db.
     """
     query = """
-        SELECT * FROM track_times
+        SELECT tt.id, tt.track, t.tr_abbrev, tt.time_str, tt.cc, tt.items
+        FROM track_times tt
+        JOIN tracks t ON tt.track = t.tr_name
         ORDER BY id DESC
         LIMIT ?
     """
     return query_db(query, (n,))
+
+def delete_time(id: str):
+    """Deletes an entry from the times table given an ID.
+
+    Args:
+        id (str): ID of the entry.
+    """
+    conn = get_db()
+    conn.execute("DELETE FROM track_times WHERE id = ?", (id,))
+    conn.commit()
+    close_db(conn)
 
 def get_best_times(cc: str, items: str) -> tuple:
     """Gets the current PBs from the times table in the db, for a given CC and item type.
@@ -174,4 +187,4 @@ if __name__ in "__main__":
 
     # Otherwise, used for debugging stuff
     # print([row["time_str"] for row in get_best_times("150cc", "Shrooms")])
-    # print([[j for j in i] for i in get_recent_times(n="10")])
+    # print([[j for j in i] for i in get_recent_times(n="3")])

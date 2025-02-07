@@ -64,5 +64,10 @@ def update():
 def picker():
     return render_template("picker.html")
 
+@app.route("/delete/<int:entry_id>", methods=["POST"])
+def delete_time(entry_id):
+    db.delete_time(entry_id)
+    return redirect(url_for("update", deleted="true"))
+
 if __name__ == "__main__":
     app.run(debug=True)

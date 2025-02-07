@@ -6,13 +6,46 @@
     <h1>Update Track Time</h1>
     <p>Use the following form to insert a new time into the database. You can view and delete recently saved times with the table below.</p>
 
-    <!-- Success alert -->
+    <!-- Addition success alert -->
     <div id="success-alert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
         Time added successfully!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 
-    <form method="POST" class="row g-3 align-items-center" onsubmit="return validateTrack()">
+    <!-- Deletion success alert -->
+    <div id="deleteSuccessAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+        Time deleted successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Confirm deletion modal -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this entry?</p>
+                    <ul>
+                        <li><strong>Track:</strong> <span id="deleteTrack"></span></li>
+                        <li><strong>Time:</strong> <span id="deleteTime"></span></li>
+                        <li><strong>CC:</strong> <span id="deleteCC"></span></li>
+                        <li><strong>Items:</strong> <span id="deleteItems"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteForm" method="POST">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <form method="POST" class="row g-3 align-items-center">
         
         <!-- Track Selection -->
         <div class="col-md-4">
@@ -65,10 +98,11 @@
             <thead>
                 <tr>
                     <th>Track</th>
+                    <th>Code</th>
                     <th>Time</th>
                     <th>Speed</th>
                     <th>Items</th>
-                    <th>Track Link</th>
+                    <th>Link</th>
                     <th>Delete</th>
                 </tr>
             </thead>
@@ -76,11 +110,23 @@
                 {% for entry in recent_times %}
                 <tr>
                     <td>{{ entry.track }}</td>
+                    <td>{{ entry.tr_abbrev }}</td>
                     <td>{{ entry.time_str }}</td>
                     <td>{{ entry.cc }}</td>
                     <td>{{ entry.items }}</td>
                     <td>Not done</td>
-                    <td>Not done</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm delete-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal"
+                                data-id="{{ entry.id }}"
+                                data-track="{{ entry.track }}"
+                                data-time="{{ entry.time_str }}"
+                                data-cc="{{ entry.cc }}"
+                                data-items="{{ entry.items }}">
+                            <b>&times;</b>
+                        </button>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -96,6 +142,7 @@
     <!-- Scripts -->
     <!-- See: https://select2.org/ -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('#track').select2({
@@ -111,4 +158,31 @@
             }
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let deleteButtons = document.querySelectorAll(".delete-btn");
+            let deleteForm = document.getElementById("deleteForm");
+            let deleteTrack = document.getElementById("deleteTrack");
+            let deleteTime = document.getElementById("deleteTime");
+            let deleteCC = document.getElementById("deleteCC");
+            let deleteItems = document.getElementById("deleteItems");
+    
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function() {
+                    let entryId = this.getAttribute("data-id");
+                    deleteTrack.textContent = this.getAttribute("data-track");
+                    deleteTime.textContent = this.getAttribute("data-time");
+                    deleteCC.textContent = this.getAttribute("data-cc");
+                    deleteItems.textContent = this.getAttribute("data-items");
+
+                    deleteForm.action = "{{ url_for('delete_time', entry_id=0) }}".replace('0', entryId);
+                });
+            });
+
+            if (new URLSearchParams(window.location.search).has("deleted")) {
+                document.getElementById("deleteSuccessAlert").classList.remove("d-none");
+            }
+        });
+    </script>     
 {% endblock %}
