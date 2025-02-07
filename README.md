@@ -1,8 +1,9 @@
 # Mario Kart 8 Deluxe Time Trials Visualiser
 
-Personal project combining my hobby with some data visualisation and analysis. 
-Ideally becomes a web app with all the features I want to implement. 
-Back-end basics are mostly done so now want to make a web-app for a decent UI to interact with.
+Personal project combining my hobby with some data visualisation and analysis.
+Ideally becomes a web app with all the features I want to implement.
+Back-end stuff and a basic front-end are done.
+Next goal is to improve the templates to be more user-friendly and customisable.
 
 ## High-level Goals
 - [x] Back-end stuff like parsing and combining data, simple visualisations
@@ -11,12 +12,32 @@ Back-end basics are mostly done so now want to make a web-app for a decent UI to
 - [x] SQLite for database, design schemas
 - [ ] Front-end libraries for things like data tables, interactive graphs, templates
 
-### Future considerations:
-- [ ] Support for track name abbreviations (e.g., MKS == Mario Kart Stadium)
-- [ ] Practice suggestions based on select criteria (such as choosing from worst 10 times)
-- [ ] Get WR video and other info when looking at specific track pages
-- [ ] Interactive visualisations (like tooltips on hover)
-- [ ] Support for different categories like 200 and NITA
+### Main TODO
+- Support for track name abbreviations (e.g., MKS = Mario Kart Stadium)
+- Support for 200cc times
+- Timesheet improvements
+    - Colours for standards and WR diffs
+    - Sorting for numeric columns (and maybe others)
+    - Better styling (left vs right align)
+    - More track info (image, cup and image)
+    - Search bar?
+    - Toggle to remove columns (num columns, standards)
+- Updater improvements
+    - More descriptive success message (you improved by 0.000 if pb)
+    - More column in recent table, add track links
+    - Delete recent time from table
+- Specific track pages
+    - Delete times from DB
+- Home page overhaul
+- Add favicon
+
+### Future considerations
+- Track picker for smart suggestions
+- Get WR video and other info when looking at specific track pages
+- Interactive visualisations (like tooltips on hover)
+- Support for NITA times, WRs
+- File upload support for timesheets as CSVs
+- Users and auth, going public
 
 ## Overview
 The application is built using Flask, which is run with the following command:
