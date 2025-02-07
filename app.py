@@ -3,7 +3,7 @@ from markupsafe import escape
 import pandas as pd
 
 import db
-from timesheet import CC_CATEGORIES, ITEM_OPTIONS, create_timesheet_df
+from timesheet import CC_CATEGORIES, ITEM_OPTIONS, STANDARDS_150, create_timesheet_df
 
 app = Flask(__name__)
 
@@ -11,8 +11,8 @@ TRACKS = [(row["tr_name"], row["tr_abbrev"]) for row in db.get_tracks()]
 TRACK_NAMES = [i[0] for i in TRACKS]
 
 # Ideally WRs are scraped from the site on demand, but this is easier for now
-wrs_150_shrooms = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
-wrs_200_shrooms = pd.read_csv("data/200cc_wrs_03_02_2025.csv", header=None)
+wrs_150_shrooms = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)[1].values
+wrs_200_shrooms = pd.read_csv("data/200cc_wrs_03_02_2025.csv", header=None)[1].values
 
 @app.route("/")
 def index():
@@ -25,9 +25,11 @@ def timesheet():
     selected_items = request.args.get("items", "Shrooms")
 
     # Fetch filtered data
-    best_times = pd.DataFrame([(row["track"], row["time_str"]) for row in db.get_best_times(selected_cc, selected_items)])
-    wrs_df = wrs_150_shrooms if selected_cc == "150cc" else wrs_200_shrooms
-    times_df = create_timesheet_df(best_times, wrs_df)
+    pbs = [row["time_str"] for row in db.get_best_times(selected_cc, selected_items)]
+    wrs = wrs_150_shrooms if selected_cc == "150cc" else wrs_200_shrooms
+
+    # Create the timesheet df
+    times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, STANDARDS_150)
 
     return render_template(
         "timesheet.html",

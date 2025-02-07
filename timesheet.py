@@ -115,35 +115,95 @@ def update_wr_csv(cc: Literal["150cc", "200cc"] = "150cc", path: str = None):
 #endregion
 
 #region Timesheet functions
-def determine_standard_and_diff(track_no: int, time: TrackTime, standards: DataFrame | None = None) -> tuple[str, TrackTime]:
+def calculate_standard(time: TrackTime, standards: list, names: list | None = None) -> tuple[str, TrackTime]:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
     Mario Kart, standards are usually something like:
     `God > Myth > Titan > Hero > Exp > Adv > Int > Beg`
     with subdivisions like `A > B > C`.
 
+    As an example, if the time was `1:00.000` and the standards were `Gold: 0:55.000` and 
+    `Silver: 1:05.000`, then the time would be classified as Silver with a difference of `0:05.000`
+    to the next standard.
+
     Args:
-        track_no (int): the track number for the given time.
-        time (TrackTime): the given time to categorise.
-        standards (DataFrame, optional): the cut-offs to determine the rank, defaults to default
-        150cc standards.
+        time (TrackTime): The given time to categorise.
+        standards (list): The cut-offs to determine the rank. E.g. `["1:00.000", "1:10.000"]`
+        names (list): The names of the standards. E.g. `["Gold", "Silver"]`
 
     Returns:
-        tuple[str, TrackTime]: tuple containing the rank name and the difference to the next rank
+        tuple[str, TrackTime]: Tuple containing (rank_name, next_rank_diff).
     """
-    if standards is None: # Check if using custom standards
-        standards = STANDARDS_150
+    if names is None:
+        names = STANDARDS_NAMES
 
-    row = standards.iloc[track_no]
-    for i, item in enumerate(row[1:].items()):
-        rank, cutoff = item
+    if len(standards) != len(names):
+        raise ValueError("Standard names and cutoffs are different lengths.")
+
+    for i, cutoff in enumerate(standards):
         if time <= cutoff:
             # Get the previous bound if not already top rank
-            to_next = row.get(i) if i > 0 else None
-            return (rank, time - TrackTime(to_next)) if to_next else (rank, TrackTime("0:00.000"))
-    return "Unranked", time - TrackTime(row.iloc[-1])
+            rank = names[i]
+            to_next = standards[i-1] if i > 0 else None
+            diff = time - TrackTime(to_next) if to_next else TrackTime("0:00.000")
+            return rank, diff
+    return "Unranked", time - TrackTime(standards[-1])
 
-def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | None = None) -> DataFrame:
-    """Create a timesheet with various data based on the given times and WRs. Standards can be 
+def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame | None = None) -> DataFrame:
+    """Create a timesheet for the given PB times. The timesheet is a DataFrame that includes various 
+    useful columns, such as the WR, standard, and differences. Columns appended with `"Num"` are 
+    copies of another column with the time converted from a formatted string (M:SS.sss) to a float, 
+    in seconds.
+
+    Note that the lists of track names and times are assumed to already be aligned.
+
+    Args:
+        tracks (list): Ordered list of track names.
+        pbs (list): Ordered list of PBs.
+        wrs (list): Ordered list of WRs.
+        standards (DataFrame | None, optional): Standards used to determine the rank of each track time. Defaults to None.
+
+    Raises:
+        ValueError: If the standards are not provided. This will be changed in future.
+
+    Returns:
+        DataFrame: The completed timesheet.
+    """
+    # TODO support functionality when standards are not needed
+    if standards is None:
+        raise ValueError("Standards must be provided at this point.")
+
+    column_names = [
+        "TrackNo", "TrackName", "Time", "TimeNum",
+        "Standard", "StandardDiff", "StandardDiffNum",
+        "WR", "WRNum", "WRDiff", "WRDiffNum", "WRDiffNorm"
+    ]
+    stnd_names = standards.columns[1:]
+    
+    timesheet = []
+    for num in range(len(tracks)):
+        row = []
+        tr_name = tracks[num]
+        pb_time = TrackTime(pbs[num])
+        wr_time = TrackTime(wrs[num])
+        wr_diff = pb_time - wr_time
+
+        # Calculate standards
+        stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num][1:], stnd_names)
+
+        row = [
+            num + 1, tr_name, pb_time, pb_time.get_seconds(),
+            stnd_name, stnd_diff, stnd_diff.get_seconds(),
+            wr_time, wr_time.get_seconds(), wr_diff, wr_diff.get_seconds()
+        ]
+        row.append(row[-1] / row[-3] * 100) # WRDiffNorm
+        timesheet.append(row)
+
+    return DataFrame(timesheet, columns=column_names)
+
+def create_timesheet_df_old(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | None = None) -> DataFrame:
+    """NOTE: this function is deprecated. Please see `create_timesheet_df` instead.
+    
+    Create a timesheet with various data based on the given times and WRs. Standards can be 
     optionally included if desired, otherwise data will be only based on WR comparisons.
     
     Timesheet will contain:
@@ -177,7 +237,7 @@ def create_timesheet_df(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | N
         # Convert to TrackTime class to handle operations
         time = TrackTime(time)
         wr = TrackTime(wr)
-        standard, stnd_diff = determine_standard_and_diff(track_no, time)
+        standard, stnd_diff = calculate_standard(track_no, time)
         wr_diff = time - wr
 
         timesheet.append([
@@ -328,7 +388,11 @@ if __name__ in "__main__":
     # Create timesheet
     times_150 = pd.read_csv("data/150cc_times.csv", header=None)
     wrs_150 = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
-    timesheet = create_timesheet_df(times_150, wrs_150)
+    track_names = times_150[0].values
+    timesheet = create_timesheet_df(track_names, times_150[1].values, wrs_150[1].values, STANDARDS_150)
+
+    # Testing standard diff calcs
+    # print(calculate_standard("1:01.010", ["0:55.000", "1:01.000"], ["A", "B"]))
 
     # Do stuff with it
     # print(timesheet.head(10))
