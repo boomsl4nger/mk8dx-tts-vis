@@ -6,11 +6,12 @@ Back-end stuff and a basic front-end are done.
 Next goal is to improve the templates to be more user-friendly and customisable.
 
 ## High-level Goals
+See `todo.md` for more specific stuff.
 - [x] Back-end stuff like parsing and combining data, simple visualisations
 - [x] Set up Flask for a basic web app
 - [x] Set up SQLite for database, design schemas
 - [ ] Design pages for different features using Bootstrap
-- [ ] Front-end libraries for things like data tables, interactive graphs, templates
+- [ ] Front-end libraries for things like data tables, interactive graphs
 - [ ] Testing, better input validation, error handling, etc.
 
 ## Overview
@@ -32,7 +33,7 @@ deactivate                  # to exit
 ### Requirements
 TODO
 
-### Initialising the Database
+### Initialising the database
 To initialise (or drop and re-create) the database file, run the following command:
 ```
 python -c "import db; db.init_db()"
@@ -42,5 +43,12 @@ This will create the tables as specified in the `schema.sql` file.
 ## References / Resources
 - https://flask.palletsprojects.com/en/stable/
 - https://jinja.palletsprojects.com/en/stable/templates/
+
+### Styling
 - https://getbootstrap.com/
+- https://datatables.net/manual/installation
+- https://select2.org/
+
+### Data viz stuff
 - https://seaborn.pydata.org/examples/index.html
+- https://www.chartjs.org/docs/latest/

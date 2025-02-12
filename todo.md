@@ -2,17 +2,14 @@
 Moved out of the readme.
 
 ## Main TODO
+- Handle missing times in timesheet construction
 - Support for 200cc times
 - Support for NITA WRs
 - Handle negative diffs (e.g. edge case where user has a time lower than given wr)
 - Timesheet improvements
     - Colours for standards and WR diffs
-    - Sorting for numeric columns (and maybe others)
-    - Better styling (left vs right align)
-    - More track info (image, cup and image)
-    - Search bar?
-    - Toggle to remove columns (num columns, standards)
-    - Overall sheet statistics, total, mean, etc
+    - More track info (cup, code, num)
+    - Overall sheet statistics, total, mean, histograms, count tables?
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
     - Add track links in recent table
@@ -20,6 +17,8 @@ Moved out of the readme.
     - Delete times from DB
 - Home page overhaul
     - Glossary maybe
+- Track and cup images
+- Add like the entire track picker page lmao
 
 ## Future considerations
 - Track picker for smart suggestions
