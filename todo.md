@@ -7,8 +7,8 @@ Moved out of the readme.
 - Support for NITA WRs
 - Handle negative diffs (e.g. edge case where user has a time lower than given wr)
 - Timesheet improvements
-    - Colours for standards and WR diffs
-    - More track info (cup, code, num)
+    - More track info (cup / image, code)
+    - Add track links
     - Overall sheet statistics, total, mean, histograms, count tables?
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
@@ -19,6 +19,7 @@ Moved out of the readme.
     - Glossary maybe
 - Track and cup images
 - Add like the entire track picker page lmao
+- Colourblind support would be cool (cividis?)
 
 ## Future considerations
 - Track picker for smart suggestions
@@ -26,4 +27,4 @@ Moved out of the readme.
 - Interactive visualisations (like tooltips on hover)
 - Support for NITA times, WRs
 - File upload support for timesheets as CSVs
-- Users and auth, going public
+- Users and auth, going public, github pages or similar

@@ -52,3 +52,6 @@ This will create the tables as specified in the `schema.sql` file.
 ### Data viz stuff
 - https://seaborn.pydata.org/examples/index.html
 - https://www.chartjs.org/docs/latest/
+- https://imagecolorpicker.com/color-code/2596be
+- https://www.npmjs.com/package/colormap
+- https://d3js.org/d3-scale-chromatic
