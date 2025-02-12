@@ -111,12 +111,18 @@ def insert_time(track: str, time: str, cc: str, items: str):
     time_sec = TrackTime(time).get_seconds()
 
     conn = get_db()
-    conn.execute(
-        "INSERT INTO track_times (track, time_str, time_sec, cc, items) VALUES (?, ?, ?, ?, ?)",
-        (track, time, time_sec, cc, items),
-    )
-    conn.commit()
+    try:
+        conn.execute(
+            "INSERT INTO track_times (track, time_str, time_sec, cc, items) VALUES (?, ?, ?, ?, ?)",
+            (track, time, time_sec, cc, items),
+        )
+        conn.commit()
+    except sqlite3.IntegrityError:
+        close_db(conn)
+        return False
+    
     close_db(conn)
+    return True
 
 def get_tracks() -> tuple:
     """Get all rows from the tracks table in the db.
@@ -188,3 +194,5 @@ if __name__ in "__main__":
     # Otherwise, used for debugging stuff
     # print([row["time_str"] for row in get_best_times("150cc", "Shrooms")])
     # print([[j for j in i] for i in get_recent_times(n="3")])
+    # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
+    # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))

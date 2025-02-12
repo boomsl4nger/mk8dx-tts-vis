@@ -16,5 +16,6 @@ CREATE TABLE track_times (
     time_sec REAL NOT NULL,
     cc TEXT NOT NULL,
     items TEXT NOT NULL,
-    FOREIGN KEY (track) REFERENCES tracks(tr_name)
+    FOREIGN KEY (track) REFERENCES tracks(tr_name),
+    UNIQUE(track, time_str, cc, items)
 );

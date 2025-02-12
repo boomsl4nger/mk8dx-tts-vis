@@ -7,10 +7,20 @@
     <p>Use the following form to insert a new time into the database. You can view and delete recently saved times with the table below.</p>
 
     <!-- Addition success alert -->
-    <div id="success-alert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+    {% if success %}
+    <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
         Time added successfully!
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    {% endif %}
+
+    <!-- Addition failed alert -->
+    {% if error %}
+    <div id="success-alert" class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
 
     <!-- Deletion success alert -->
     <div id="deleteSuccessAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
@@ -142,12 +152,6 @@
                 placeholder: "Track name or code...",
                 allowClear: true
             });
-
-            // Show success alert if redirected with ?success
-            let urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has("success")) {
-                $("#success-alert").removeClass("d-none");
-            }
         });
     </script>
 

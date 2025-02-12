@@ -37,6 +37,9 @@ def timesheet():
 
 @app.route("/update", methods=["GET", "POST"])
 def update():
+    error = None
+    success = False
+
     if request.method == "POST":
         track = request.form["track"]
         time = request.form["time"]
@@ -44,18 +47,20 @@ def update():
         items = request.form["items"]
 
         if track not in TRACK_NAMES: # Validate track exists
-            # This flash call actually won't work I think
-            flash("Interal error: invalid track name", "danger")
-            return redirect(url_for("update"))
-
-        db.insert_time(track, time, cc, items)
-        return redirect(url_for("update", success=True))
+            error = "Track name not recognised."
+        else:
+            success = db.insert_time(track, time, cc, items)
+            if not success: # Validate non-duplicate
+                error = "Time already exists."
+            else:
+                success = True
 
     recent_times = db.get_recent_times("10")
 
     return render_template("update.html",
         track_names=TRACKS, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS,
-        recent_times=recent_times)
+        recent_times=recent_times,
+        error=error, success=success)
 
 @app.route("/picker")
 def picker():
