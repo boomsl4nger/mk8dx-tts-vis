@@ -26,37 +26,37 @@
 
     <!-- The actual timesheet -->
     <!-- See: https://datatables.net/manual/data/orthogonal-data#HTML-5 -->
-    <div class="table-responsive">
-        <table id="timesheetTable" class="table hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Track</th>
-                    <th>Time</th>
-                    <th>Standard</th>
-                    <th>To Next</th>
-                    <th>WR</th>
-                    <th>Diff</th>
-                    <th>Diff (Norm)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in times %}
-                <tr>
-                    <td>{{ row.TrackNo }}</td>
-                    <td>{{ row.TrackName }}</td>
-                    <td data-sort="{{ row.TimeNum }}">{{ row.Time }}</td>
-                    <td>{{ row.Standard }}</td>
-                    <td data-sort="{{ row.StandardDiffNum }}">{{ row.StandardDiff }}</td>
-                    <td data-sort="{{ row.WRNum }}">{{ row.WR }}</td>
-                    <td data-sort="{{ row.WRDiffNum }}">{{ row.WRDiff }}</td>
-                    <td>{{ "%.3f"|format(row.WRDiffNorm) }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <table id="timesheetTable" class="table hover">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Track</th>
+                <th>Time</th>
+                <th>Standard</th>
+                <th>To Next</th>
+                <th>WR</th>
+                <th>Diff</th>
+                <th>Diff (Norm)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in times %}
+            <tr>
+                <td>{{ row.TrackNo }}</td>
+                <td>{{ row.TrackName }}</td>
+                <td data-sort="{{ row.TimeNum }}">{{ row.Time }}</td>
+                <td class="colour-rank">{{ row.Standard }}</td>
+                <td data-sort="{{ row.StandardDiffNum }}">{{ row.StandardDiff }}</td>
+                <td data-sort="{{ row.WRNum }}">{{ row.WR }}</td>
+                <td class="colour-diff" data-sort="{{ row.WRDiffNum }}">{{ row.WRDiff }}</td>
+                <td>{{ "%.3f"|format(row.WRDiffNorm) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='timesheet.js') }}"></script>
+    <!-- <script defer src="{{ url_for('static', filename='timesheet.js') }}"></script> -->
+    <script type="module" src="{{ url_for('static', filename='timesheet.js') }}"></script>
 {% endblock %}
