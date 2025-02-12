@@ -50,7 +50,7 @@
                     <td data-sort="{{ row.StandardDiffNum }}">{{ row.StandardDiff }}</td>
                     <td data-sort="{{ row.WRNum }}">{{ row.WR }}</td>
                     <td data-sort="{{ row.WRDiffNum }}">{{ row.WRDiff }}</td>
-                    <td>{{ row.WRDiffNorm }}</td>
+                    <td>{{ "%.3f"|format(row.WRDiffNorm) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
