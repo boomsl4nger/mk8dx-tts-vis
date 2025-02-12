@@ -195,7 +195,7 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
             stnd_name, stnd_diff, stnd_diff.get_seconds(),
             wr_time, wr_time.get_seconds(), wr_diff, wr_diff.get_seconds()
         ]
-        row.append(row[-1] / row[-3] * 100) # WRDiffNorm
+        row.append(round(row[-1] / row[-3] * 100, 5)) # WRDiffNorm
         timesheet.append(row)
 
     return DataFrame(timesheet, columns=column_names)

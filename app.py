@@ -20,25 +20,20 @@ def index():
 
 @app.route("/timesheet", methods=["GET"])
 def timesheet():
-    # Get selected filters (default: 150cc, Shrooms)
     selected_cc = request.args.get("cc", "150cc")
     selected_items = request.args.get("items", "Shrooms")
 
-    # Fetch filtered data
+    # Fetch filtered data and create timesheet df
     pbs = [row["time_str"] for row in db.get_best_times(selected_cc, selected_items)]
     wrs = wrs_150_shrooms if selected_cc == "150cc" else wrs_200_shrooms
-
-    # Create the timesheet df
     times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, STANDARDS_150)
 
-    return render_template(
-        "timesheet.html",
-        times=times_df.to_html(index=False, classes="table table-striped"),
+    return render_template("timesheet.html",
+        times=times_df.to_dict(orient="records"),
         selected_cc=selected_cc,
         selected_items=selected_items,
         cc_categories=CC_CATEGORIES, 
-        item_options=ITEM_OPTIONS
-    )
+        item_options=ITEM_OPTIONS)
 
 @app.route("/update", methods=["GET", "POST"])
 def update():

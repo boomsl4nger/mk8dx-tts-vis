@@ -5,7 +5,7 @@
 {% block content %}
     <h1>Timesheet</h1>
 
-    <!-- Filtering Form -->
+    <!-- Filters form (change cc or items) -->
     <form method="GET" class="mb-3">
         <label for="cc" class="form-label">Select CC:</label>
         <select name="cc" id="cc" class="form-select d-inline w-auto">
@@ -24,7 +24,39 @@
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
 
+    <!-- The actual timesheet -->
+    <!-- See: https://datatables.net/manual/data/orthogonal-data#HTML-5 -->
     <div class="table-responsive">
-        {{ times | safe }}
-    </div>
+        <table id="timesheetTable" class="table hover">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Track</th>
+                    <th>Time</th>
+                    <th>Standard</th>
+                    <th>To Next</th>
+                    <th>WR</th>
+                    <th>Diff</th>
+                    <th>Diff (Norm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in times %}
+                <tr>
+                    <td>{{ row.TrackNo }}</td>
+                    <td>{{ row.TrackName }}</td>
+                    <td data-sort="{{ row.TimeNum }}">{{ row.Time }}</td>
+                    <td>{{ row.Standard }}</td>
+                    <td data-sort="{{ row.StandardDiffNum }}">{{ row.StandardDiff }}</td>
+                    <td data-sort="{{ row.WRNum }}">{{ row.WR }}</td>
+                    <td data-sort="{{ row.WRDiffNum }}">{{ row.WRDiff }}</td>
+                    <td>{{ row.WRDiffNorm }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='timesheet.js') }}"></script>
 {% endblock %}
