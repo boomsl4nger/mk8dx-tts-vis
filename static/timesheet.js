@@ -63,6 +63,9 @@ const DIFF_MAX = 10;
 const DIFF_STEP = 1.0;
 
 function getWRDiffColor(diff) {
+    // Check input is numeric
+    if (isNaN(diff)) { return "white"}
+
     // Normalise based on diff range
     // let normalisedDiff = Math.max(DIFF_MIN, Math.min(diff, DIFF_MAX)) / DIFF_MAX;
     // return d3.interpolateSpectral(1 - normalizedDiff);

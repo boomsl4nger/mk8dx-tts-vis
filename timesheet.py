@@ -182,10 +182,21 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
     
     timesheet = []
     for num in range(len(tracks)):
-        row = []
         tr_name = tracks[num]
-        pb_time = TrackTime(pbs[num])
         wr_time = TrackTime(wrs[num])
+
+        try:
+            TrackTime(pbs[num])
+        except ValueError: # Time is not valid, and likely empty
+            timesheet.append([
+                num + 1, tr_name, "-", "-",
+                "-", "-", "-", "-",
+                wr_time, wr_time.get_seconds(), "-", "-", 0
+            ])
+            continue
+
+        row = []
+        pb_time = TrackTime(pbs[num])
         wr_diff = pb_time - wr_time
 
         # Calculate standards

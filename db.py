@@ -172,11 +172,15 @@ def get_best_times(cc: str, items: str) -> tuple:
         tuple: Tuple containing Row objects from the db.
     """
     query = """
-        SELECT tt.track, MIN(tt.time_sec) AS best_time_sec, tt.time_str
-        FROM track_times tt
-        JOIN tracks t ON tt.track = t.tr_name
-        WHERE tt.cc = ? AND tt.items = ?
-        GROUP BY tt.track
+        SELECT t.tr_name AS track, 
+            COALESCE(MIN(tt.time_sec), NULL) AS best_time_sec, 
+            COALESCE(tt.time_str, '-') AS time_str
+        FROM tracks t
+        LEFT JOIN track_times tt 
+            ON t.tr_name = tt.track 
+            AND tt.cc = ? 
+            AND tt.items = ?
+        GROUP BY t.tr_name
         ORDER BY t.tr_number
     """
     return query_db(query, (cc, items))
@@ -192,7 +196,7 @@ if __name__ in "__main__":
     # init_times_from_csv(times_path)
 
     # Otherwise, used for debugging stuff
-    # print([row["time_str"] for row in get_best_times("150cc", "Shrooms")])
+    print([row["time_str"] for row in get_best_times("200cc", "Shrooms")])
     # print([[j for j in i] for i in get_recent_times(n="3")])
     # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
     # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
