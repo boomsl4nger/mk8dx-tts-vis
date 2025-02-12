@@ -115,7 +115,7 @@ def update_wr_csv(cc: Literal["150cc", "200cc"] = "150cc", path: str = None):
 #endregion
 
 #region Timesheet functions
-def calculate_standard(time: TrackTime, standards: list, names: list | None = None) -> tuple[str, TrackTime]:
+def calculate_standard(time: TrackTime, standards: list, names: list | None = None) -> tuple:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
     Mario Kart, standards are usually something like:
     `God > Myth > Titan > Hero > Exp > Adv > Int > Beg`
@@ -131,7 +131,7 @@ def calculate_standard(time: TrackTime, standards: list, names: list | None = No
         names (list): The names of the standards. E.g. `["Gold", "Silver"]`
 
     Returns:
-        tuple[str, TrackTime]: Tuple containing (rank_name, next_rank_diff).
+        tuple: Tuple containing (rank_arg, rank_name, next_rank_diff).
     """
     if names is None:
         names = STANDARDS_NAMES
@@ -145,14 +145,15 @@ def calculate_standard(time: TrackTime, standards: list, names: list | None = No
             rank = names[i]
             to_next = standards[i-1] if i > 0 else None
             diff = time - TrackTime(to_next) if to_next else TrackTime("0:00.000")
-            return rank, diff
-    return "Unranked", time - TrackTime(standards[-1])
+            return i+1, rank, diff
+    return len(names)+1, "Unranked", time - TrackTime(standards[-1])
 
 def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame | None = None) -> DataFrame:
     """Create a timesheet for the given PB times. The timesheet is a DataFrame that includes various 
     useful columns, such as the WR, standard, and differences. Columns appended with `"Num"` are 
     copies of another column with the time converted from a formatted string (M:SS.sss) to a float, 
-    in seconds.
+    in seconds. StandardNum is different as this contains the number position of the rank, e.g.,
+    `Gold` would be 1 if it was the top rank, etc.
 
     Note that the lists of track names and times are assumed to already be aligned.
 
@@ -174,7 +175,7 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
 
     column_names = [
         "TrackNo", "TrackName", "Time", "TimeNum",
-        "Standard", "StandardDiff", "StandardDiffNum",
+        "Standard", "StandardNum", "StandardDiff", "StandardDiffNum",
         "WR", "WRNum", "WRDiff", "WRDiffNum", "WRDiffNorm"
     ]
     stnd_names = standards.columns[1:]
@@ -188,11 +189,11 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
         wr_diff = pb_time - wr_time
 
         # Calculate standards
-        stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num][1:], stnd_names)
+        stnd_arg, stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num][1:], stnd_names)
 
         row = [
             num + 1, tr_name, pb_time, pb_time.get_seconds(),
-            stnd_name, stnd_diff, stnd_diff.get_seconds(),
+            stnd_name, stnd_arg, stnd_diff, stnd_diff.get_seconds(),
             wr_time, wr_time.get_seconds(), wr_diff, wr_diff.get_seconds()
         ]
         row.append(round(row[-1] / row[-3] * 100, 5)) # WRDiffNorm
