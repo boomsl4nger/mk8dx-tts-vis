@@ -162,7 +162,10 @@ def delete_time(id: str):
     close_db(conn)
 
 def get_best_times(cc: str, items: str) -> tuple:
-    """Gets the current PBs from the times table in the db, for a given CC and item type.
+    """Gets the current PBs from the times table in the db, for a given CC and item type. Query does
+    a left outer join on the tracks table, so all tracks are included regardless of whether there
+    are any respective saved times. Missing times are returned as NULL for `best_time_sec` and `"-"`
+    for `time_str`.
 
     Args:
         cc (str): CC.
@@ -196,7 +199,7 @@ if __name__ in "__main__":
     # init_times_from_csv(times_path)
 
     # Otherwise, used for debugging stuff
-    print([row["time_str"] for row in get_best_times("200cc", "Shrooms")])
+    # print([row["time_str"] for row in get_best_times("200cc", "Shrooms")])
     # print([[j for j in i] for i in get_recent_times(n="3")])
     # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
     # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
