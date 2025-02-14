@@ -6,7 +6,7 @@ Moved out of the readme.
 - Timesheet improvements
     - More track info (cup / image, code)
     - Add track links
-    - Overall sheet statistics, total, mean, histograms, count tables?
+    - Histograms, counts?
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
     - Add track links in recent table

@@ -10,7 +10,7 @@ See `todo.md` for more specific stuff.
 - [x] Back-end stuff like parsing and combining data, simple visualisations
 - [x] Set up Flask for a basic web app
 - [x] Set up SQLite for database, design schemas
-- [ ] Design pages for different features using Bootstrap
+- [x] Design pages for different features using Bootstrap
 - [ ] Front-end libraries for things like data tables, interactive graphs
 - [ ] Testing, better input validation, error handling, etc.
 
@@ -19,7 +19,7 @@ The application is built using Flask, which is run with the following command:
 ```
 python -m flask run
 ```
-Once running, the application is hosted locally on [localhost:5000](http://127.0.0.1:5000/).
+Once running, the application should be running on [localhost:5000](http://127.0.0.1:5000/).
 Append `--debug` to run in debug mode.
 
 It is strongly recommended to be working in a virtual environment. This is made pretty simple by running the following commands:
