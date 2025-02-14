@@ -58,11 +58,25 @@
 
     <!-- Overall statistics -->
     <h2 id="overall-stats">Overall Statistics</h2>
-    <ul>
-        {% for k,v in overall_stats.items() %}
-            <li>{{k}}: {{v}}</li>
+    <table class="table table-responsive table-bordered table-sm w-auto">
+        <thead>
+            <th>Metric</th><th>Score</th>
+        </thead>
+        <tbody>
+            {% for k,v in overall_stats.items() %}
+            <tr>
+                <td>{{ k }}</td>
+                {% if k == "Overall Rank" %}
+                    <td class="colour-rank">{{ v }}</td>
+                {% elif k == "Diff Average" or k == "Diff Median" %}
+                    <td class="colour-diff" data-sort="{{ v[0] }}">{{ v[1] }}</td>
+                {% else %}
+                    <td>{{ v }}</td>
+                {% endif %}
+            </tr>
         {% endfor %}
-    </ul>
+        </tbody>
+    </table>
 
     <a href="#top">Back to Top</a>
 {% endblock %}

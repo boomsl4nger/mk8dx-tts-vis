@@ -318,8 +318,10 @@ def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict:
     # TODO improve this metric
 
     # Other stats
-    stats["Diff Average"] = TrackTime._format_seconds(sheet["WRDiffNum"].mean())
-    stats["Diff Median"] = TrackTime._format_seconds(sheet["WRDiffNum"].median())
+    diff_avg = sheet["WRDiffNum"].mean()
+    diff_med = sheet["WRDiffNum"].median()
+    stats["Diff Average"] = (diff_avg, TrackTime._format_seconds(diff_avg))
+    stats["Diff Median"] = (diff_med, TrackTime._format_seconds(diff_med))
     stats["Diff Std Dev"] = TrackTime._format_seconds(sheet["WRDiffNum"].std())
 
     if verbose:
