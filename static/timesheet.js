@@ -63,7 +63,6 @@ const DIFF_MAX = 10;
 const DIFF_STEP = 1.0;
 
 function getWRDiffColor(diff) {
-    // Check input is numeric
     if (isNaN(diff)) { return "white"}
 
     // Normalise based on diff range

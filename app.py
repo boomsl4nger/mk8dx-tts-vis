@@ -32,6 +32,7 @@ def timesheet():
     return render_template("timesheet.html",
         times=times_df.to_dict(orient="records"),
         overall_stats=overall_stats,
+        wr_diff_arr=times_df["WRDiffNum"].dropna().tolist(),
         selected_cc=selected_cc,
         selected_items=selected_items,
         cc_categories=CC_CATEGORIES, 
