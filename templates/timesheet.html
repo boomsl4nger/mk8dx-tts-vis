@@ -4,6 +4,7 @@
 
 {% block content %}
     <h1>Timesheet</h1>
+    <a href="#overall-stats">To Overall Statistics</a>
 
     <!-- Filters form (change cc or items) -->
     <form method="GET" class="mb-3">
@@ -54,6 +55,16 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Overall statistics -->
+    <h2 id="overall-stats">Overall Statistics</h2>
+    <ul>
+        {% for k,v in overall_stats.items() %}
+            <li>{{k}}: {{v}}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="#top">Back to Top</a>
 {% endblock %}
 
 {% block scripts %}

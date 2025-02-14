@@ -3,7 +3,7 @@ from markupsafe import escape
 import pandas as pd
 
 import db
-from timesheet import CC_CATEGORIES, ITEM_OPTIONS, STANDARDS_150, create_timesheet_df
+from timesheet import CC_CATEGORIES, ITEM_OPTIONS, STANDARDS_150, create_timesheet_df, calculate_sheet_stats
 
 app = Flask(__name__)
 
@@ -27,9 +27,11 @@ def timesheet():
     pbs = [row["time_str"] for row in db.get_best_times(selected_cc, selected_items)]
     wrs = wrs_150_shrooms if selected_cc == "150cc" else wrs_200_shrooms
     times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, STANDARDS_150)
+    overall_stats = calculate_sheet_stats(times_df)
 
     return render_template("timesheet.html",
         times=times_df.to_dict(orient="records"),
+        overall_stats=overall_stats,
         selected_cc=selected_cc,
         selected_items=selected_items,
         cc_categories=CC_CATEGORIES, 

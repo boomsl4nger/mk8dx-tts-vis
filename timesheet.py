@@ -9,7 +9,7 @@ import seaborn as sns
 from typing import Literal
 
 from outreach import fetch_wrs_shrooms
-from TrackTime import TrackTime
+from TrackTime import TrackTime, TrackTimeExt
 
 pd.set_option('display.max_rows', 20)
 pd.set_option('display.max_columns', 20)
@@ -269,7 +269,7 @@ def check_col_numeric(name: str) -> bool:
     Returns:
         bool: true if a valid name, otherwise false.
     """
-    valid = ["TimeNum", "StandardDiffNum", "WRNum", "WRDiffNum", "WRDiffNorm"]
+    valid = ["TimeNum", "StandardNum", "StandardDiffNum", "WRNum", "WRDiffNum", "WRDiffNorm"]
     return name in valid
 
 def top_n_times(timesheet: DataFrame, n: int = 10, bottom: bool = False, col: str = "TimeNum") -> DataFrame:
@@ -291,19 +291,36 @@ def top_n_times(timesheet: DataFrame, n: int = 10, bottom: bool = False, col: st
         raise ValueError("Column name needs to be numeric to sort.")
     return timesheet.sort_values(by=col, ascending=(not bottom)).iloc[:n]
 
-def calculate_sheet_stats(timesheet: DataFrame, verbose: bool = False) -> Series:
+def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict:
     """Calculates various statistics for a given timesheet, such as for the WRDiff column.
 
     Args:
-        timesheet (DataFrame): The timesheet.
+        sheet (DataFrame): The timesheet.
         verbose (bool, optional): If true, prints results. Defaults to False.
 
     Returns:
         dict: The statistics of interest.
     """
-    to_describe = ["WRDiffNum", "WRDiffNorm"]
-    stats = timesheet[to_describe].describe()
-    # timesheet.agg(["mean", "median", "std"])
+    # stats = sheet[["WRDiffNum", "WRDiffNorm"]].describe()
+    # sheet.agg(["mean", "median", "std"])
+
+    stats = {}
+
+    # Total times
+    stats["Total PB Time"] = TrackTimeExt._format_seconds(sheet["TimeNum"].sum())
+    stats["Total WR Time"] = TrackTimeExt._format_seconds(sheet["WRNum"].sum())
+    stats["Total Diff"] = TrackTimeExt._format_seconds(sheet["WRDiffNum"].sum())
+
+    # Overall rank
+    stnd_avg = sheet["StandardNum"].mean() - 0.5
+    stats["Rank Num Average"] = f"{stnd_avg:.2f}"
+    stats["Overall Rank"] = STANDARDS_NAMES[int(round(stnd_avg))]
+    # TODO improve this metric
+
+    # Other stats
+    stats["Diff Average"] = TrackTime._format_seconds(sheet["WRDiffNum"].mean())
+    stats["Diff Median"] = TrackTime._format_seconds(sheet["WRDiffNum"].median())
+    stats["Diff Std Dev"] = TrackTime._format_seconds(sheet["WRDiffNum"].std())
 
     if verbose:
         print(stats)
