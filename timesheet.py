@@ -189,9 +189,9 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
             TrackTime(pbs[num])
         except ValueError: # Time is not valid, and likely empty
             timesheet.append([
-                num + 1, tr_name, "-", "-",
-                "-", "-", "-", "-",
-                wr_time, wr_time.get_seconds(), "-", "-", 0
+                num + 1, tr_name, np.NaN, np.NaN,
+                np.NaN, np.NaN, np.NaN, np.NaN,
+                wr_time, wr_time.get_seconds(), np.NaN, np.NaN, 0
             ])
             continue
 
@@ -291,7 +291,7 @@ def top_n_times(timesheet: DataFrame, n: int = 10, bottom: bool = False, col: st
         raise ValueError("Column name needs to be numeric to sort.")
     return timesheet.sort_values(by=col, ascending=(not bottom)).iloc[:n]
 
-def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict:
+def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict | None:
     """Calculates various statistics for a given timesheet, such as for the WRDiff column.
 
     Args:
@@ -299,10 +299,13 @@ def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict:
         verbose (bool, optional): If true, prints results. Defaults to False.
 
     Returns:
-        dict: The statistics of interest.
+        dict: The statistics of interest. Returns None if the sheet is empty.
     """
     # stats = sheet[["WRDiffNum", "WRDiffNorm"]].describe()
     # sheet.agg(["mean", "median", "std"])
+
+    if sheet["TimeNum"].isna().sum() == 96:
+        return None
 
     stats = {}
 
