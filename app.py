@@ -1,9 +1,10 @@
 from flask import Flask, flash, redirect, render_template, request, url_for
 from markupsafe import escape
+import numpy as np
 import pandas as pd
 
 import db
-from timesheet import CC_CATEGORIES, ITEM_OPTIONS, STANDARDS_150, create_timesheet_df, calculate_sheet_stats
+from timesheet import CC_CATEGORIES, ITEM_OPTIONS, STANDARDS_NAMES, STANDARDS_150, create_timesheet_df, calculate_sheet_stats
 
 app = Flask(__name__)
 
@@ -29,14 +30,36 @@ def timesheet():
     times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, STANDARDS_150)
     overall_stats = calculate_sheet_stats(times_df)
 
+    # Make arguments for chart generation
+    diff_interval = 1
+    wr_diff_values = times_df["WRDiffNum"].dropna()
+    wr_bins = np.arange(0, max(wr_diff_values) + 1, diff_interval)  # 1-second intervals
+    wr_hist, wr_bin_edges = np.histogram(wr_diff_values, bins=wr_bins)
+
+    chart_diff_args = {
+        "Labels": [f"{int(edge)}-{int(edge + 1)}" for edge in wr_bin_edges[:-1]],
+        "Counts": wr_hist.tolist(),
+    }
+
+    rank_counts = {rank: 0 for rank in STANDARDS_NAMES}
+    unique_ranks, rank_frequencies = np.unique(times_df["Standard"].dropna(), return_counts=True)
+    for rank, count in zip(unique_ranks, rank_frequencies):
+        if rank in rank_counts:
+            rank_counts[rank] = count
+
+    chart_rank_args = {
+        "Labels": STANDARDS_NAMES,
+        "Counts": [rank_counts[rank] for rank in STANDARDS_NAMES],
+    }
+
+    print(chart_diff_args)
+
     return render_template("timesheet.html",
         times=times_df.to_dict(orient="records"),
         overall_stats=overall_stats,
-        wr_diff_arr=times_df["WRDiffNum"].dropna().tolist(),
-        selected_cc=selected_cc,
-        selected_items=selected_items,
-        cc_categories=CC_CATEGORIES, 
-        item_options=ITEM_OPTIONS)
+        chart_diff_args=chart_diff_args, chart_rank_args=chart_rank_args,
+        selected_cc=selected_cc, selected_items=selected_items,
+        cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 
 @app.route("/update", methods=["GET", "POST"])
 def update():

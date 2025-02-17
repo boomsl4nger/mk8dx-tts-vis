@@ -58,56 +58,88 @@
 
     <!-- Overall statistics -->
     <h2 id="overall-stats">Overall Statistics</h2>
-    <table class="table table-responsive table-bordered table-sm w-auto">
-        <thead>
-            <th>Metric</th><th>Score</th>
-        </thead>
-        <tbody>
-            {% for k,v in overall_stats.items() %}
-            <tr>
-                <td>{{ k }}</td>
-                {% if k == "Overall Rank" %}
-                    <td class="colour-rank">{{ v }}</td>
-                {% elif k == "Diff Average" or k == "Diff Median" %}
-                    <td class="colour-diff" data-sort="{{ v[0] }}">{{ v[1] }}</td>
-                {% else %}
-                    <td>{{ v }}</td>
-                {% endif %}
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    {% if overall_stats is none %}
+        <p><strong>The timesheet is empty!</strong></p>
+    {% else %}
+        <table class="table table-responsive table-bordered table-sm w-auto">
+            <thead>
+                <th>Metric</th><th>Score</th>
+            </thead>
+            <tbody>
+                {% for k,v in overall_stats.items() %}
+                <tr>
+                    <td>{{ k }}</td>
+                    {% if k == "Overall Rank" %}
+                        <td class="colour-rank">{{ v }}</td>
+                    {% elif k == "Diff Average" or k == "Diff Median" %}
+                        <td class="colour-diff" data-sort="{{ v[0] }}">{{ v[1] }}</td>
+                    {% else %}
+                        <td>{{ v }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    <!-- Histograms -->
-    <div>
-        <canvas id="diffHist"></canvas>
-    </div>
+        <!-- Histograms -->
+        <!-- See: https://thewebdev.info/2020/04/28/chart-js-create-a-histogram/ -->
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <canvas id="wrDiffChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="rankChart"></canvas>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
     <a href="#top">Back to Top</a>
 {% endblock %}
 
 {% block scripts %}
-    <!-- <script src="{{ url_for('static', filename='timesheet.js') }}"></script> -->
     <script type="module" src="{{ url_for('static', filename='timesheet.js') }}"></script>
     <script>
-        const ctx = document.getElementById('diffHist').getContext('2d');
-        const data = {
-            labels: [...Array(10).keys()].map(i => `Bin ${i + 1}`),
+        const wrDiffCtx = document.getElementById('wrDiffChart').getContext('2d');
+        const wrDiffData = {
+            labels: {{ chart_diff_args["Labels"] | tojson }},
             datasets: [{
-                label: 'WRDiffNum Distribution',
-                data: {{ wr_diff_arr }},
-                backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
+                label: 'WR Diff Distribution',
+                data: {{ chart_diff_args["Counts"] }}
             }]
         };
 
-        new Chart(ctx, {
+        new Chart(wrDiffCtx, {
             type: 'bar',
-            data: data,
+            data: wrDiffData,
             options: {
+                responsive: true,
+                aspectRatio: 1.4,
                 scales: {
                     y: { beginAtZero: true }
+                }
+            }
+        });
+
+        const rankCtx = document.getElementById('rankChart').getContext('2d');
+        const rankData = {
+            labels: {{ chart_rank_args["Labels"] | tojson }},
+            datasets: [{
+                label: 'Rank Distribution',
+                data: {{ chart_rank_args["Counts"] }}
+            }]
+        };
+
+        new Chart(rankCtx, {
+            type: 'bar',
+            data: rankData,
+            options: {
+                responsive: true,
+                aspectRatio: 1.4,
+                indexAxis: 'y', // Vertical bar chart
+                scales: {
+                    x: { beginAtZero: true }
                 }
             }
         });
