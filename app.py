@@ -52,8 +52,6 @@ def timesheet():
         "Counts": [rank_counts[rank] for rank in STANDARDS_NAMES],
     }
 
-    print(chart_diff_args)
-
     return render_template("timesheet.html",
         times=times_df.to_dict(orient="records"),
         overall_stats=overall_stats,
@@ -87,6 +85,26 @@ def update():
         track_names=TRACKS, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS,
         recent_times=recent_times,
         error=error, success=success)
+
+@app.route("/track")
+def track():
+    track_name = request.args.get("track")
+    selected_cc = request.args.get("cc", "150cc")
+    selected_items = request.args.get("items", "Shrooms")
+
+    if not track_name:
+        raise ValueError(f"Track name is invalid: {track_name}")
+
+    # Fetch times from db for specific combination
+    times = db.get_times_for_track(track_name, selected_cc, selected_items)
+    indices = list(range(1, len(times) + 1))
+    times_str = [row["time_str"] for row in times]
+    times_sec = [row["time_sec"] for row in times]
+
+    return render_template("track.html",
+        track_name=track_name,
+        selected_cc=selected_cc, selected_items=selected_items,
+        times_str=times_str, times_sec=times_sec, indices=indices)
 
 @app.route("/picker")
 def picker():

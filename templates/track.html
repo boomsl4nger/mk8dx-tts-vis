@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}{{ track_name }} ({{ selected_cc }} {{ selected_items }}){% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ track_name }}</h1>
+    <a href="{{ url_for('timesheet', cc=selected_cc, items=selected_items) }}">Back to Timesheet</a>
+    <p><strong>CC Category:</strong> {{ selected_cc }} | <strong>Item Type:</strong> {{ selected_items }}</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            <canvas id="timeProgressChart"></canvas>
+        </div>
+        <div class="col-md-4">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(times_str|length) %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ times_str[times_str|length - 1 - i] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const ctx = document.getElementById('timeProgressChart').getContext('2d');
+        const timeData = {
+            labels: {{ indices | tojson }},
+            datasets: [{
+                label: 'Time Progression',
+                data: {{ times_sec }},
+                fill: false,
+                tension: 0.1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: timeData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -124,6 +124,17 @@ def insert_time(track: str, time: str, cc: str, items: str):
     close_db(conn)
     return True
 
+def delete_time(id: str):
+    """Deletes an entry from the times table given an ID.
+
+    Args:
+        id (str): ID of the entry.
+    """
+    conn = get_db()
+    conn.execute("DELETE FROM track_times WHERE id = ?", (id,))
+    conn.commit()
+    close_db(conn)
+
 def get_tracks() -> tuple:
     """Get all rows from the tracks table in the db.
 
@@ -149,17 +160,6 @@ def get_recent_times(n: str) -> tuple:
         LIMIT ?
     """
     return query_db(query, (n,))
-
-def delete_time(id: str):
-    """Deletes an entry from the times table given an ID.
-
-    Args:
-        id (str): ID of the entry.
-    """
-    conn = get_db()
-    conn.execute("DELETE FROM track_times WHERE id = ?", (id,))
-    conn.commit()
-    close_db(conn)
 
 def get_best_times(cc: str, items: str) -> tuple:
     """Gets the current PBs from the times table in the db, for a given CC and item type. Query does
@@ -187,6 +187,25 @@ def get_best_times(cc: str, items: str) -> tuple:
         ORDER BY t.tr_number
     """
     return query_db(query, (cc, items))
+
+def get_times_for_track(name: str, cc: str, items: str) -> tuple:
+    """Gets the times for a given track combination.
+
+    Args:
+        name (str): Track name.
+        cc (str): Speed.
+        items (str): Item type.
+
+    Returns:
+        tuple: Tuple containing Row objects from the db.
+    """
+    query = """
+        SELECT time_str, time_sec
+        FROM track_times
+        WHERE track = ? AND cc = ? and items = ?
+        ORDER BY time_sec DESC
+    """
+    return query_db(query, (name, cc, items))
 
 if __name__ in "__main__":
     # Caution: running this file directly will initialise the database
