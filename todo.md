@@ -5,21 +5,22 @@ Moved out of the readme.
 - Handle negative diffs (e.g. edge case where user has a time lower than given wr)
 - Timesheet improvements
     - More track info (cup / image, code)
-    - Add track links
-    - Histograms, counts?
+    - Improve charts (palettes, styling options, etc)
+    - Think of a better overall metric
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
-    - Add track links in recent table
 - Specific track pages
     - Toggle cc and items on a track page
     - Cool visualisations
     - Times datatable
     - Insert times with autofilled fields, copying mostly from update page
     - Delete times from DB
-- Home page overhaul
-    - Glossary maybe
-- Track and cup images
+- Add track links to tables, add page for convenient track selection
+    - Track and cup images
 - Add like the entire track picker page lmao
+- Home page
+    - Glossary
+    - Better links
 
 ## Future considerations
 - Track picker with smart suggestions

@@ -11,7 +11,7 @@ See `todo.md` for more specific stuff.
 - [x] Set up Flask for a basic web app
 - [x] Set up SQLite for database, design schemas
 - [x] Design pages for different features using Bootstrap
-- [ ] Front-end libraries for things like data tables, interactive graphs
+- [x] Front-end libraries for things like data tables, interactive graphs
 - [ ] Testing, better input validation, error handling, etc.
 
 ## Overview
