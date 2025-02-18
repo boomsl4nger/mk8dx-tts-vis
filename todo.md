@@ -10,12 +10,12 @@ Moved out of the readme.
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
 - Specific track pages
-    - Cool visualisations, show ranks and wr on improvements graph
+    - Show ranks and wr line on improvements graph
     - Add improvement diff and wr diff columns, add to tooltip
     - Times datatable with pages
     - Insert times with autofilled fields, copying mostly from update page
     - Delete times from DB
-- Add track links to tables, add page for convenient track selection
+- Add page for convenient track selection
     - Track and cup images
 - Add like the entire track picker page lmao
 - Home page
