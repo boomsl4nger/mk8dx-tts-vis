@@ -11,8 +11,8 @@ Moved out of the readme.
     - More descriptive success message (you improved by 0.000 if pb)
 - Specific track pages
     - Toggle cc and items on a track page
-    - Cool visualisations
-    - Times datatable
+    - Cool visualisations, show ranks on improvements graph
+    - Times datatable with pages
     - Insert times with autofilled fields, copying mostly from update page
     - Delete times from DB
 - Add track links to tables, add page for convenient track selection

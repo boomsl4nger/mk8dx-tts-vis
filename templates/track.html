@@ -36,14 +36,21 @@
 
 {% block scripts %}
     <script>
+        const indices = {{ indices | tojson }};
+        const timesStr = {{ times_str | tojson }};  // Already formatted "M:SS.sss"
+        const timesSec = {{ times_sec | tojson }};
+
         const ctx = document.getElementById('timeProgressChart').getContext('2d');
         const timeData = {
-            labels: {{ indices | tojson }},
+            labels: indices,
             datasets: [{
-                label: 'Time Progression',
-                data: {{ times_sec }},
+                label: 'PB Progression',
+                data: timesSec,
+                stepped: true,
+                // tension: 0.1,
+                pointRadius: 6,
+                pointHoverRadius: 8,
                 fill: false,
-                tension: 0.1
             }]
         };
 
@@ -52,8 +59,36 @@
             data: timeData,
             options: {
                 responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const index = tooltipItem.dataIndex;
+                                return `${timesStr[index]} (${timesSec[index].toFixed(3)})`;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
                 scales: {
-                    y: { beginAtZero: false }
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Improvement #",
+                            font: { size: 14, weight: "bold" }
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Time (s)",
+                            font: { size: 14, weight: "bold" }
+                        },
+                        beginAtZero: false
+                    }
                 }
             }
         });
