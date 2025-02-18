@@ -4,9 +4,29 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>{{ track_name }}</h1>
+    <h1>{{ track_name }} ({{ track_abbrev }})</h1>
     <a href="{{ url_for('timesheet', cc=selected_cc, items=selected_items) }}">Back to Timesheet</a>
-    <p><strong>CC Category:</strong> {{ selected_cc }} | <strong>Item Type:</strong> {{ selected_items }}</p>
+
+    <!-- Filters form (change cc or items) -->
+    <form method="GET" class="mb-3">
+        <input type="hidden" name="track" value="{{ track_name }}">
+
+        <label for="cc" class="form-label">Select CC:</label>
+        <select name="cc" id="cc" class="form-select d-inline w-auto">
+            {% for cc in cc_categories %}
+                <option value="{{ cc }}" {% if cc == selected_cc %}selected{% endif %}>{{ cc }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="items" class="form-label">Select Item Type:</label>
+        <select name="items" id="items" class="form-select d-inline w-auto">
+            {% for item in item_options %}
+                <option value="{{ item }}" {% if item == selected_items %}selected{% endif %}>{{ item }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+    </form>
 
     <div class="row">
         <div class="col-md-8">

@@ -10,8 +10,8 @@ Moved out of the readme.
 - Updater improvements
     - More descriptive success message (you improved by 0.000 if pb)
 - Specific track pages
-    - Toggle cc and items on a track page
-    - Cool visualisations, show ranks on improvements graph
+    - Cool visualisations, show ranks and wr on improvements graph
+    - Add improvement diff and wr diff columns, add to tooltip
     - Times datatable with pages
     - Insert times with autofilled fields, copying mostly from update page
     - Delete times from DB

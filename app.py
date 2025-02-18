@@ -94,6 +94,8 @@ def track():
 
     if not track_name:
         raise ValueError(f"Track name is invalid: {track_name}")
+    
+    track_abbrev = db.query_db("SELECT tr_abbrev FROM tracks WHERE tr_name = ?", (track_name,), one=True)[0]
 
     # Fetch times from db for specific combination
     times = db.get_times_for_track(track_name, selected_cc, selected_items)
@@ -102,8 +104,9 @@ def track():
     times_sec = [row["time_sec"] for row in times]
 
     return render_template("track.html",
-        track_name=track_name,
+        track_name=track_name, track_abbrev=track_abbrev,
         selected_cc=selected_cc, selected_items=selected_items,
+        cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS,
         times_str=times_str, times_sec=times_sec, indices=indices)
 
 @app.route("/picker")
