@@ -8,10 +8,10 @@
     <a href="{{ url_for('timesheet', cc=selected_cc, items=selected_items) }}">Back to Timesheet</a>
 
     <!-- Insertion alerts -->
-    {% include 'insert_time_alerts.html' %}
+    {% include "components/insert_time_alerts.html" %}
 
     <!-- Deletion alert and modal -->
-    {% include "delete_time_modal.html" %}
+    {% include "components/delete_time_modal.html" %}
 
     <!-- Filters form (change cc or items) -->
     <form method="GET" class="mb-3">

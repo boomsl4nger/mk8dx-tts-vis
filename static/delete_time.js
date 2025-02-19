@@ -18,8 +18,4 @@ document.addEventListener("DOMContentLoaded", function() {
             deleteForm.action = deleteForm.dataset.baseUrl.replace('0', entryId);
         });
     });
-
-    if (new URLSearchParams(window.location.search).has("deleted")) {
-        document.getElementById("deleteSuccessAlert").classList.remove("d-none");
-    }
 });

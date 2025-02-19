@@ -7,10 +7,10 @@
     <p>Use the following form to insert a new time into the database. You can view and delete recently saved times with the table below.</p>
 
     <!-- Insertion alerts -->
-    {% include 'insert_time_alerts.html' %}
+    {% include "components/insert_time_alerts.html" %}
 
     <!-- Deletion alert and modal -->
-    {% include "delete_time_modal.html" %}
+    {% include "components/delete_time_modal.html" %}
     
     <form method="POST" action="{{ url_for('insert_time') }}" class="row g-3 align-items-center">
         

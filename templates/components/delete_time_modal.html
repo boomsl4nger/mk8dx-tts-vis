@@ -1,10 +1,10 @@
-<!-- Alert -->
-<div id="deleteSuccessAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+{% if request.args.get("deleted") %}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
     Time deleted successfully!
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
+{% endif %}
 
-<!-- Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
