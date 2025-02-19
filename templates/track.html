@@ -38,8 +38,7 @@
         <div class="col-md-8">
             <!-- Chart -->
             <canvas id="timeProgressChart"></canvas>
-        </div>
-        <div class="col-md-4">
+
             <!-- Add new time form -->
             <form method="POST" action="{{ url_for('insert_time') }}" class="row g-3 form-inline">
                 <input type="hidden" name="track" value="{{ track_name }}">
@@ -47,7 +46,7 @@
                 <input type="hidden" name="items" value="{{ selected_items }}">
             
                 <!-- Time Input -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <input type="text" name="time" id="time" class="form-control" placeholder="1:23.456" pattern="^(\d+):(\d{2})\.(\d{3})$" required>
                 </div>
             
@@ -56,6 +55,11 @@
                 </div>
             </form>
 
+            <!-- Toggle chart features -->
+            <button id="toggleWR" class="btn btn-outline-secondary">Toggle WR Line</button>
+            <button id="toggleScale" class="btn btn-outline-secondary">Toggle Log Scale</button>
+        </div>
+        <div class="col-md-4">
             <!-- Times datatable -->
             <table class="table table-sm hover compact" id="timesTable">
                 <thead>
@@ -97,9 +101,24 @@
 
 {% block scripts %}
     <script>
-        const indices = {{ times | tojson | safe }}.map(t => t["Num"]);
-        const timesStr = {{ times | tojson | safe }}.map(t => t["Time"]).reverse();
-        const timesSec = {{ times | tojson | safe }}.map(t => t["TimeNum"]).reverse();
+        const times = {{ times | tojson | safe }}
+        const indices = times.map(t => t.Num);
+        const timesStr = times.map(t => t.Time).reverse();
+        const timesSec = times.map(t => t.TimeNum).reverse();
+
+        const wrSec = {{ wr[1] | tojson }};
+        const wrStr = {{ wr[0] | tojson }};
+
+        let wrLabels = [...indices];
+        let wrData = indices.map(() => wrSec);
+
+        if (wrLabels.length < 2) {
+            // If less than one data point, add a fake point to draw the wr line
+            wrLabels = [1, 2];
+            wrData = [wrSec, wrSec];
+        }
+        console.log(indices)
+        console.log(wrLabels)
     </script>
     <script type="module" src="{{ url_for('static', filename='track.js') }}"></script>
     <script src="{{ url_for('static', filename='delete_time.js') }}"></script>

@@ -1,18 +1,32 @@
 const ctx = document.getElementById('timeProgressChart').getContext('2d');
+
 const timeData = {
-    labels: indices,
-    datasets: [{
-        label: 'PB Progression',
-        data: timesSec,
-        // stepped: true,
-        tension: 0.05,
-        pointRadius: 6,
-        pointHoverRadius: 10,
-        fill: false,
-    }]
+    labels: indices.length > 1 ? indices : wrLabels,
+    datasets: [
+        { // PB lines
+            label: 'PB Progression',
+            data: timesSec,
+            borderColor: '#36A2EB',
+            backgroundColor: '#9BD0F5',
+            // stepped: true,
+            tension: 0.05,
+            pointRadius: 6,
+            pointHoverRadius: 10,
+            fill: false,
+        },
+        { // WR line
+            label: 'WR',
+            data: wrData,
+            borderColor: "red",
+            borderWidth: 2,
+            borderDash: [10, 5],
+            pointRadius: 0,
+            hidden: true  // Initially hidden
+        }
+    ]
 };
 
-new Chart(ctx, {
+const timeChart = new Chart(ctx, {
     type: 'line',
     data: timeData,
     options: {
@@ -21,8 +35,11 @@ new Chart(ctx, {
             tooltip: {
                 callbacks: {
                     label: function(tooltipItem) {
-                        const index = tooltipItem.dataIndex;
-                        return `${timesStr[index]} (${timesSec[index].toFixed(3)})`;
+                        // Ensure custom tooltip only applies to the main dataset (index 0)
+                        if (tooltipItem.datasetIndex === 0) {
+                            const index = tooltipItem.dataIndex;
+                            return `${timesStr[index]} (${timesSec[index].toFixed(3)})`;
+                        } else { return null; }
                     }
                 }
             }
@@ -49,6 +66,22 @@ new Chart(ctx, {
             }
         }
     }
+});
+
+// Toggle WR line visibility
+document.getElementById("toggleWR").addEventListener("click", function() {
+    let wrDataset = timeChart.data.datasets[1];
+    wrDataset.hidden = !wrDataset.hidden;
+    timeChart.update();
+});
+
+// Toggle WR line visibility
+document.getElementById("toggleScale").addEventListener("click", function() {
+    let curScale = timeChart.options.scales.y;
+    if ( curScale.type == "linear" ) {
+        curScale.type = "logarithmic";
+    } else { curScale.type = "linear"; }
+    timeChart.update();
 });
 
 document.addEventListener("DOMContentLoaded", function() {
