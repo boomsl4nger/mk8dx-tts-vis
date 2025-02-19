@@ -49,11 +49,15 @@ def query_db(query: str, args: tuple = (), one: bool = False) -> tuple:
 def init_db():
     """Initialise the db based on the schema file.
     """
+    # Create tables from schema
     conn = get_db()
     with open("schema.sql", "r") as f:
         conn.executescript(f.read())
     conn.commit()
     close_db(conn)
+
+    # Populate tracks table
+    init_tracks_from_csv(tracks_path)
 
 def init_tracks_from_csv(path: str):
     """Insert track information into the table given a CSV file path.
@@ -214,7 +218,6 @@ if __name__ in "__main__":
 
     # Uncomment the following if you want to re-init the db
     # init_db()
-    # init_tracks_from_csv(tracks_path)
     # init_times_from_csv(times_path)
 
     # Otherwise, used for debugging stuff
