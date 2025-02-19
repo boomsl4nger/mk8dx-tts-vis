@@ -3,15 +3,19 @@ Moved out of the readme.
 
 ## Main TODO
 - Handle negative diffs (e.g. edge case where user has a time lower than given wr)
+- Track and cup images (urgggghhh)
+    - https://www.mariowiki.com/Category:Mario_Kart_8_/_Mario_Kart_8_Deluxe_course_icons
+    - https://www.mariowiki.com/Gallery:Mario_Kart_8
+    - https://www.mariowiki.com/Gallery:Mario_Kart_8_Deluxe
+- Style the components with the bootstrap grid properly, you bot (NO)
+- Style the charts better, palettes and stuff (mmm reading)
+- Add a dummy times sheet for messing around with, rand diff wr + 1-12s
 - Timesheet improvements
-    - More track info (cup / image, code)
-    - Improve charts (palettes, styling options, etc)
+    - Add codes to table
     - Think of a better overall metric
 - Specific track pages
-    - Show ranks and wr line on improvements graph
-    - Toggles for wr line and log scaling?
+    - Show ranks on graph
 - Add page for convenient track selection
-    - Track and cup images
 - Add like the entire track picker page lmao
 - Home page
     - Glossary
