@@ -6,26 +6,13 @@
     <h1>Update Track Time</h1>
     <p>Use the following form to insert a new time into the database. You can view and delete recently saved times with the table below.</p>
 
-    <!-- Addition success alert -->
-    {% if success %}
-    <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
-        Time added successfully!
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endif %}
-
-    <!-- Addition failed alert -->
-    {% if error %}
-    <div id="success-alert" class="alert alert-warning alert-dismissible fade show" role="alert">
-        <strong>Error:</strong> {{ error }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endif %}
+    <!-- Insertion alerts -->
+    {% include 'insert_time_alerts.html' %}
 
     <!-- Deletion alert and modal -->
     {% include "delete_time_modal.html" %}
     
-    <form method="POST" class="row g-3 align-items-center">
+    <form method="POST" action="{{ url_for('insert_time') }}" class="row g-3 align-items-center">
         
         <!-- Track Selection -->
         <div class="col-md-4">

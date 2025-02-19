@@ -1,0 +1,13 @@
+{% if request.args.get("success") == "true" %}
+    <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+        Time added successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+{% if request.args.get("error") %}
+    <div id="error-alert" class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> {{ request.args.get("error") }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}

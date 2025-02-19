@@ -59,32 +59,11 @@ def timesheet():
         selected_cc=selected_cc, selected_items=selected_items,
         cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 
-@app.route("/update", methods=["GET", "POST"])
+@app.route("/update", methods=["GET"])
 def update():
-    error = None
-    success = False
-
-    if request.method == "POST":
-        track = request.form["track"]
-        time = request.form["time"]
-        cc = request.form["cc"]
-        items = request.form["items"]
-
-        if track not in TRACK_NAMES: # Validate track exists
-            error = "Track name not recognised."
-        else:
-            success = db.insert_time(track, time, cc, items)
-            if not success: # Validate non-duplicate
-                error = "Time already exists."
-            else:
-                success = True
-
-    recent_times = db.get_recent_times("10")
-
     return render_template("update.html",
         track_names=TRACKS, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS,
-        recent_times=recent_times,
-        error=error, success=success)
+        recent_times=db.get_recent_times("10"))
 
 @app.route("/track")
 def track():
@@ -124,6 +103,28 @@ def delete_time(entry_id):
     if track_name:
         return redirect(url_for("track", track=track_name, cc=selected_cc, items=selected_items, deleted="true"))
     return redirect(url_for("update", deleted="true"))
+
+@app.route("/insert_time", methods=["POST"])
+def insert_time():
+    track = request.form.get("track")
+    time = request.form.get("time")
+    cc = request.form.get("cc", "150cc")
+    items = request.form.get("items", "Shrooms")
+
+    if not track or track not in TRACK_NAMES:   # Validate track exists
+        error = "Track name not recognised."
+    else:
+        success = db.insert_time(track, time, cc, items)
+        if not success:                         # Validate non-duplicate
+            error = "Time already exists."
+        else:
+            success = True
+            error = None
+
+    referrer = request.referrer or url_for("update")
+    if "track" in referrer:
+        return redirect(url_for("track", track=track, cc=cc, items=items, success="true" if success else "false", error=error))
+    return redirect(url_for("update", success="true" if success else "false", error=error))
 
 
 

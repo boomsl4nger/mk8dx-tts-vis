@@ -7,6 +7,9 @@
     <h1>{{ track_name }} ({{ track_abbrev }})</h1>
     <a href="{{ url_for('timesheet', cc=selected_cc, items=selected_items) }}">Back to Timesheet</a>
 
+    <!-- Insertion alerts -->
+    {% include 'insert_time_alerts.html' %}
+
     <!-- Deletion alert and modal -->
     {% include "delete_time_modal.html" %}
 
@@ -33,19 +36,27 @@
 
     <div class="row">
         <div class="col-md-8">
+            <!-- Chart -->
             <canvas id="timeProgressChart"></canvas>
         </div>
         <div class="col-md-4">
-            <!-- Add time form -->
-            <!-- <form method="POST" action="url_for('insert_time', track=track_name, cc=selected_cc, items=selected_items) }}" class="row g-3">
+            <!-- Add new time form -->
+            <form method="POST" action="{{ url_for('insert_time') }}" class="row g-3 form-inline">
+                <input type="hidden" name="track" value="{{ track_name }}">
+                <input type="hidden" name="cc" value="{{ selected_cc }}">
+                <input type="hidden" name="items" value="{{ selected_items }}">
+            
+                <!-- Time Input -->
                 <div class="col-md-4">
-                    <label for="time" class="form-label">New Time:</label>
-                    <input type="text" name="time" id="time" class="form-control" placeholder="M:SS.sss" required>
+                    <input type="text" name="time" id="time" class="form-control" placeholder="1:23.456" pattern="^(\d+):(\d{2})\.(\d{3})$" required>
                 </div>
+            
                 <div class="col-md-2">
-                    <button type="submit" class="btn btn-success mt-4">Add Time</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
-            </form> -->
+            </form>
+
+            <!-- Times datatable -->
             <table class="table table-sm hover compact" id="timesTable">
                 <thead>
                     <tr>
