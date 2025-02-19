@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 import db
-from timesheet import CC_CATEGORIES, ITEM_OPTIONS, STANDARDS_NAMES, STANDARDS_150, create_timesheet_df, calculate_sheet_stats
+from timesheet import *
 
 app = Flask(__name__)
 
@@ -27,13 +27,13 @@ def timesheet():
     # Fetch filtered data and create timesheet df
     pbs = [row["time_str"] for row in db.get_best_times(selected_cc, selected_items)]
     wrs = wrs_150_shrooms if selected_cc == "150cc" else wrs_200_shrooms
-    times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, STANDARDS_150)
+    times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, selected_cc, selected_items)
     overall_stats = calculate_sheet_stats(times_df)
 
     # Make arguments for chart generation
     diff_interval = 1
     wr_diff_values = times_df["WRDiffNum"].dropna()
-    wr_bins = np.arange(0, max(wr_diff_values) + 1, diff_interval)  # 1-second intervals
+    wr_bins = np.arange(0, max(wr_diff_values) + 1 if wr_diff_values.any() else 1, diff_interval)
     wr_hist, wr_bin_edges = np.histogram(wr_diff_values, bins=wr_bins)
 
     chart_diff_args = {
