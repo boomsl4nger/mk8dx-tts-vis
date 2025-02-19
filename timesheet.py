@@ -20,6 +20,11 @@ sns.set_theme(style="whitegrid")
 CC_CATEGORIES = ["150cc", "200cc"]
 ITEM_OPTIONS = ["Shrooms", "NITA"]
 
+WRS_150_SHROOMS = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
+WRS_200_SHROOMS = pd.read_csv("data/200cc_wrs_03_02_2025.csv", header=None)
+WRS_150_NITA = None
+WRS_200_NITA = None
+
 STANDARDS_150_SHROOMS = pd.read_csv("data/150cc_standards.csv")
 STANDARDS_200_SHROOMS = None
 STANDARDS_150_NITA = None
@@ -144,6 +149,38 @@ def determine_standards(cc: str, items: str) -> DataFrame | None:
 
     key = (cc.upper(), items.upper())
     return standards_map.get(key, None)
+
+def determine_wrs(cc: str, items: str, values_only: bool = True) -> DataFrame | list | None:
+    """Get the WRs corresponding to the given CC and item type. The DFs should exist for each 
+    combination of cc and item options, but might not until later in development; best to check if 
+    you get a None returned.
+
+    Args:
+        cc (str): CC.
+        items (str): Item type.
+        values_only (bool, optional): If true, returns a list with only the time; otherwise, returns
+            a DF. Defaults to True.
+
+    Raises:
+        ValueError: If cc or items is invalid.
+
+    Returns:
+        DataFrame | list | None: WRs iterable if it exists, else None.
+    """
+    if cc not in CC_CATEGORIES or items not in ITEM_OPTIONS:
+        raise ValueError(f"Args not recognised: {cc}, {items}")
+
+    wrs_map = {
+        ("150CC", "SHROOMS"): WRS_150_SHROOMS,
+        ("200CC", "SHROOMS"): WRS_200_SHROOMS,
+        ("150CC", "NITA"): WRS_150_NITA,
+        ("200CC", "NITA"): WRS_200_NITA,
+    }
+
+    key = (cc.upper(), items.upper())
+    if values_only:
+        return wrs_map.get(key, None)[1].values
+    return wrs_map.get(key, None)
 
 def calculate_standard(time: TrackTime, standards: list, names: list = None) -> tuple:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For

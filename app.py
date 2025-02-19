@@ -11,10 +11,6 @@ app = Flask(__name__)
 TRACKS = [(row["tr_name"], row["tr_abbrev"]) for row in db.get_tracks()]
 TRACK_NAMES = [i[0] for i in TRACKS]
 
-# Ideally WRs are scraped from the site on demand, but this is easier for now
-wrs_150_shrooms = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)[1].values
-wrs_200_shrooms = pd.read_csv("data/200cc_wrs_03_02_2025.csv", header=None)[1].values
-
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -26,7 +22,7 @@ def timesheet():
 
     # Fetch filtered data and create timesheet df
     pbs = [row["time_str"] for row in db.get_best_times(selected_cc, selected_items)]
-    wrs = wrs_150_shrooms if selected_cc == "150cc" else wrs_200_shrooms
+    wrs = determine_wrs(selected_cc, selected_items)
     times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, selected_cc, selected_items)
     overall_stats = calculate_sheet_stats(times_df)
 
@@ -75,6 +71,12 @@ def track():
         raise ValueError(f"Track name is invalid: {track_name}")
     
     track_abbrev = db.query_db("SELECT tr_abbrev FROM tracks WHERE tr_name = ?", (track_name,), one=True)[0]
+    wr_df = determine_wrs(selected_cc, selected_items, values_only=False)
+    if wr_df is not None:
+        wr_time = wr_df.loc[wr_df[0] == track_name][1].values[0]
+        wr_pair = [wr_time, TrackTime(wr_time).get_seconds()]
+    else:
+        wr_pair = [None, None]
 
     # Fetch times from db for specific combination
     times = db.get_times_for_track(track_name, selected_cc, selected_items)
@@ -83,7 +85,7 @@ def track():
 
     return render_template("track.html",
         track_name=track_name, track_abbrev=track_abbrev,
-        times=df.to_dict(orient="records"),
+        times=df.to_dict(orient="records"), wr=wr_pair,
         selected_cc=selected_cc, selected_items=selected_items,
         cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 
