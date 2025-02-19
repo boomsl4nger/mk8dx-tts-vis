@@ -20,8 +20,10 @@ sns.set_theme(style="whitegrid")
 CC_CATEGORIES = ["150cc", "200cc"]
 ITEM_OPTIONS = ["Shrooms", "NITA"]
 
-STANDARDS_150 = pd.read_csv("data/150cc_standards.csv")
-STANDARDS_200 = None
+STANDARDS_150_SHROOMS = pd.read_csv("data/150cc_standards.csv")
+STANDARDS_200_SHROOMS = None
+STANDARDS_150_NITA = None
+STANDARDS_200_NITA = None
 STANDARDS_NAMES = [
     'God', 'Myth A', 'Myth B', 'Myth C', 'Titan A', 'Titan B', 'Titan C', 
     'Hero A', 'Hero B', 'Hero C', 'Exp A', 'Exp B', 'Exp C', 'Adv A', 'Adv B', 'Adv C', 
@@ -115,7 +117,35 @@ def update_wr_csv(cc: Literal["150cc", "200cc"] = "150cc", path: str = None):
 #endregion
 
 #region Timesheet functions
-def calculate_standard(time: TrackTime, standards: list, names: list | None = None) -> tuple:
+def determine_standards(cc: str, items: str) -> DataFrame | None:
+    """Get the standards DF corresponding to the given CC and item type. The DFs should exist for 
+    each combination of cc and item options, but might not until later in development; best to check
+    if you get a None returned.
+
+    Args:
+        cc (str): CC.
+        items (str): Item type.
+
+    Raises:
+        ValueError: If cc or items is invalid.
+
+    Returns:
+        DataFrame | None: Standards DF if it exists, else None.
+    """
+    if cc not in CC_CATEGORIES or items not in ITEM_OPTIONS:
+        raise ValueError(f"Args not recognised: {cc}, {items}")
+
+    standards_map = {
+        ("150CC", "SHROOMS"): STANDARDS_150_SHROOMS,
+        ("200CC", "SHROOMS"): STANDARDS_200_SHROOMS,
+        ("150CC", "NITA"): STANDARDS_150_NITA,
+        ("200CC", "NITA"): STANDARDS_200_NITA,
+    }
+
+    key = (cc.upper(), items.upper())
+    return standards_map.get(key, None)
+
+def calculate_standard(time: TrackTime, standards: list, names: list = None) -> tuple:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
     Mario Kart, standards are usually something like:
     `God > Myth > Titan > Hero > Exp > Adv > Int > Beg`
@@ -128,7 +158,8 @@ def calculate_standard(time: TrackTime, standards: list, names: list | None = No
     Args:
         time (TrackTime): The given time to categorise.
         standards (list): The cut-offs to determine the rank. E.g. `["1:00.000", "1:10.000"]`
-        names (list): The names of the standards. E.g. `["Gold", "Silver"]`
+        names (list): The names of the standards. E.g. `["Gold", "Silver"]`. If None, default names
+        are used.
 
     Returns:
         tuple: Tuple containing (rank_arg, rank_name, next_rank_diff).
@@ -148,7 +179,7 @@ def calculate_standard(time: TrackTime, standards: list, names: list | None = No
             return i+1, rank, diff
     return len(names)+1, "Unranked", time - TrackTime(standards[-1])
 
-def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame | None = None) -> DataFrame:
+def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str) -> DataFrame:
     """Create a timesheet for the given PB times. The timesheet is a DataFrame that includes various 
     useful columns, such as the WR, standard, and differences. Columns appended with `"Num"` are 
     copies of another column with the time converted from a formatted string (M:SS.sss) to a float, 
@@ -161,24 +192,18 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
         tracks (list): Ordered list of track names.
         pbs (list): Ordered list of PBs.
         wrs (list): Ordered list of WRs.
-        standards (DataFrame | None, optional): Standards used to determine the rank of each track time. Defaults to None.
-
-    Raises:
-        ValueError: If the standards are not provided. This will be changed in future.
+        cc (str): CC.
+        items (str): Item type.
 
     Returns:
         DataFrame: The completed timesheet.
     """
-    # TODO support functionality when standards are not needed
-    if standards is None:
-        raise ValueError("Standards must be provided at this point.")
-
     column_names = [
         "TrackNo", "TrackName", "Time", "TimeNum",
         "Standard", "StandardNum", "StandardDiff", "StandardDiffNum",
         "WR", "WRNum", "WRDiff", "WRDiffNum", "WRDiffNorm"
     ]
-    stnd_names = standards.columns[1:]
+    standards = determine_standards(cc, items)
     
     timesheet = []
     for num in range(len(tracks)):
@@ -200,11 +225,14 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, standards: DataFrame
         wr_diff = pb_time - wr_time
 
         # Calculate standards
-        stnd_arg, stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num][1:], stnd_names)
+        stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+        if standards is not None:
+            stnd_arg, stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num][1:])
+            stnd_diff_num = stnd_diff.get_seconds()
 
         row = [
             num + 1, tr_name, pb_time, pb_time.get_seconds(),
-            stnd_name, stnd_arg, stnd_diff, stnd_diff.get_seconds(),
+            stnd_name, stnd_arg, stnd_diff, stnd_diff_num,
             wr_time, wr_time.get_seconds(), wr_diff, wr_diff.get_seconds()
         ]
         row.append(round(row[-1] / row[-3] * 100, 5)) # WRDiffNorm
@@ -260,6 +288,34 @@ def create_timesheet_df_old(pbs: DataFrame, wrs: DataFrame, standards: DataFrame
 
     return DataFrame(timesheet, columns=col_names)
 
+def create_track_times_df(times: list) -> DataFrame:
+    """Create a sheet based on time improvements for a track.
+
+    NOTE: the times list is assumed to be (unordered) floats of times in seconds, which is what the 
+    db should be saving as a column and hence given to this function after a query.
+
+    Args:
+        times (list): List of PBs for the track. Assumed to be floats.
+
+    Returns:
+        DataFrame: _description_
+    """
+    column_names = ["Num", "Time", "TimeNum", "Impr", "ImprNum"]
+    tracksheet = []
+
+    if times:
+        for i in range(len(times) - 1):
+            diff = times[i+1] - times[i]
+            tracksheet.append([
+                i+1, TrackTime._format_seconds(times[i]), times[i], TrackTime._format_seconds(diff), diff
+            ])
+
+        tracksheet.append([
+            len(times), TrackTime._format_seconds(times[-1]), times[-1], None, None
+        ])
+
+    return DataFrame(tracksheet, columns=column_names)
+
 def check_col_numeric(name: str) -> bool:
     """Check if a given column name for a timesheet is numeric.
 
@@ -304,7 +360,7 @@ def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict | Non
     # stats = sheet[["WRDiffNum", "WRDiffNorm"]].describe()
     # sheet.agg(["mean", "median", "std"])
 
-    if sheet["TimeNum"].isna().sum() == 96:
+    if sheet["TimeNum"].notna().sum() == 0:
         return None
 
     stats = {}
@@ -315,10 +371,11 @@ def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict | Non
     stats["Total Diff"] = TrackTimeExt._format_seconds(sheet["WRDiffNum"].sum())
 
     # Overall rank
-    stnd_avg = sheet["StandardNum"].mean() - 0.5
-    stats["Rank Num Average"] = f"{stnd_avg:.2f}"
-    stats["Overall Rank"] = STANDARDS_NAMES[int(round(stnd_avg))]
     # TODO improve this metric
+    stnd_avg = sheet["StandardNum"].mean() - 0.5
+    if not np.isnan(stnd_avg):
+        stats["Rank Num Average"] = f"{stnd_avg:.2f}"
+        stats["Overall Rank"] = STANDARDS_NAMES[int(round(stnd_avg))]
 
     # Other stats
     diff_avg = sheet["WRDiffNum"].mean()
@@ -369,7 +426,7 @@ def create_visuals_overall(timesheet: DataFrame):
     # plt.ylabel("Standard Name")
     plt.show()
 
-def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_150, track_name: str = None, track_no: int = None):
+def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_150_SHROOMS, track_name: str = None, track_no: int = None):
     """Create visualisations for a given individual track. Also used for testing mostly. Either the
     track name or number must be provided.
 
@@ -423,7 +480,7 @@ if __name__ in "__main__":
     times_150 = pd.read_csv("data/150cc_times.csv", header=None)
     wrs_150 = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
     track_names = times_150[0].values
-    timesheet = create_timesheet_df(track_names, times_150[1].values, wrs_150[1].values, STANDARDS_150)
+    timesheet = create_timesheet_df(track_names, times_150[1].values, wrs_150[1].values, STANDARDS_150_SHROOMS)
 
     # Testing standard diff calcs
     # print(calculate_standard("1:01.010", ["0:55.000", "1:01.000"], ["A", "B"]))

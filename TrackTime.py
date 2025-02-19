@@ -54,6 +54,14 @@ class TrackTime:
     
     @staticmethod
     def _format_seconds(s: float) -> str:
+        """Converts a time float in seconds to a formatted string.
+
+        Args:
+            s (float): Time (seconds).
+
+        Returns:
+            str: Formatted time string.
+        """
         return TrackTime._format_timedelta(timedelta(seconds=s))
     
     def _ensure_track_time(self, other):
