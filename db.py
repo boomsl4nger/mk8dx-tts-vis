@@ -200,10 +200,10 @@ def get_times_for_track(name: str, cc: str, items: str) -> tuple:
         tuple: Tuple containing Row objects from the db.
     """
     query = """
-        SELECT time_str, time_sec
+        SELECT id, time_str, time_sec
         FROM track_times
         WHERE track = ? AND cc = ? and items = ?
-        ORDER BY time_sec DESC
+        ORDER BY time_sec
     """
     return query_db(query, (name, cc, items))
 

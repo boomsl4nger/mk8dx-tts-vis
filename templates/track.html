@@ -7,6 +7,9 @@
     <h1>{{ track_name }} ({{ track_abbrev }})</h1>
     <a href="{{ url_for('timesheet', cc=selected_cc, items=selected_items) }}">Back to Timesheet</a>
 
+    <!-- Deletion alert and modal -->
+    {% include "delete_time_modal.html" %}
+
     <!-- Filters form (change cc or items) -->
     <form method="GET" class="mb-3">
         <input type="hidden" name="track" value="{{ track_name }}">
@@ -33,18 +36,45 @@
             <canvas id="timeProgressChart"></canvas>
         </div>
         <div class="col-md-4">
-            <table class="table table-sm table-striped">
+            <!-- Add time form -->
+            <!-- <form method="POST" action="url_for('insert_time', track=track_name, cc=selected_cc, items=selected_items) }}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="time" class="form-label">New Time:</label>
+                    <input type="text" name="time" id="time" class="form-control" placeholder="M:SS.sss" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-success mt-4">Add Time</button>
+                </div>
+            </form> -->
+            <table class="table table-sm hover compact" id="timesTable">
                 <thead>
                     <tr>
                         <th>#</th>
                         <th>Time</th>
+                        <th>Impr</th>
+                        <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in range(times_str|length) %}
+                    {% for row in times %}
                     <tr>
-                        <td>{{ i + 1 }}</td>
-                        <td>{{ times_str[times_str|length - 1 - i] }}</td>
+                        <td>{{ times|length - row.Num + 1 }}</td>
+                        <td>{{ row.Time }}</td>
+                        <td>{% if row.Impr is not none %} -{{ row.Impr }} {% endif %}</td>
+                        <td>
+                            <button class="btn btn-danger delete-btn icon-link"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#confirmDeleteModal"
+                                    data-id="{{ row.RowId }}"
+                                    data-track="{{ track_name }}"
+                                    data-time="{{ row.Time }}"
+                                    data-cc="{{ selected_cc }}"
+                                    data-items="{{ selected_items }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                    <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                                </svg>
+                            </button>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -56,61 +86,10 @@
 
 {% block scripts %}
     <script>
-        const indices = {{ indices | tojson }};
-        const timesStr = {{ times_str | tojson }};  // Already formatted "M:SS.sss"
-        const timesSec = {{ times_sec | tojson }};
-
-        const ctx = document.getElementById('timeProgressChart').getContext('2d');
-        const timeData = {
-            labels: indices,
-            datasets: [{
-                label: 'PB Progression',
-                data: timesSec,
-                stepped: true,
-                // tension: 0.1,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                fill: false,
-            }]
-        };
-
-        new Chart(ctx, {
-            type: 'line',
-            data: timeData,
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                const index = tooltipItem.dataIndex;
-                                return `${timesStr[index]} (${timesSec[index].toFixed(3)})`;
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: "Improvement #",
-                            font: { size: 14, weight: "bold" }
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: "Time (s)",
-                            font: { size: 14, weight: "bold" }
-                        },
-                        beginAtZero: false
-                    }
-                }
-            }
-        });
+        const indices = {{ times | tojson | safe }}.map(t => t["Num"]);
+        const timesStr = {{ times | tojson | safe }}.map(t => t["Time"]).reverse();
+        const timesSec = {{ times | tojson | safe }}.map(t => t["TimeNum"]).reverse();
     </script>
+    <script type="module" src="{{ url_for('static', filename='track.js') }}"></script>
+    <script src="{{ url_for('static', filename='delete_time.js') }}"></script>
 {% endblock %}

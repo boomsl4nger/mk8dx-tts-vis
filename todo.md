@@ -7,14 +7,11 @@ Moved out of the readme.
     - More track info (cup / image, code)
     - Improve charts (palettes, styling options, etc)
     - Think of a better overall metric
-- Updater improvements
-    - More descriptive success message (you improved by 0.000 if pb)
 - Specific track pages
     - Show ranks and wr line on improvements graph
-    - Add improvement diff and wr diff columns, add to tooltip
+    - Toggles for wr line and log scaling?
     - Times datatable with pages
     - Insert times with autofilled fields, copying mostly from update page
-    - Delete times from DB
 - Add page for convenient track selection
     - Track and cup images
 - Add like the entire track picker page lmao

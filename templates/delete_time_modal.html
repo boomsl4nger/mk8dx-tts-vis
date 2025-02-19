@@ -1,0 +1,35 @@
+<!-- Alert -->
+<div id="deleteSuccessAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+    Time deleted successfully!
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this entry?</p>
+                <ul>
+                    <li><strong>Track:</strong> <span id="deleteTrack"></span></li>
+                    <li><strong>Time:</strong> <span id="deleteTime"></span></li>
+                    <li><strong>CC:</strong> <span id="deleteCC"></span></li>
+                    <li><strong>Items:</strong> <span id="deleteItems"></span></li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteForm" method="POST" data-base-url="{{ url_for('delete_time', entry_id=0) }}">
+                    <input type="hidden" name="track_name" value="{{ track_name }}">
+                    <input type="hidden" name="selected_cc" value="{{ selected_cc }}">
+                    <input type="hidden" name="selected_items" value="{{ selected_items }}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
