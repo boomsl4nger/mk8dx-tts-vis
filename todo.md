@@ -10,7 +10,6 @@ Moved out of the readme.
 - Specific track pages
     - Show ranks and wr line on improvements graph
     - Toggles for wr line and log scaling?
-    - Times datatable with pages
     - Insert times with autofilled fields, copying mostly from update page
 - Add page for convenient track selection
     - Track and cup images

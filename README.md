@@ -1,9 +1,9 @@
 # Mario Kart 8 Deluxe Time Trials Visualiser
 
 Personal project combining my hobby with some data visualisation and analysis.
-Ideally becomes a web app with all the features I want to implement.
-Back-end stuff and a basic front-end are done.
-Next goal is to improve the templates to be more user-friendly and customisable.
+This is mostly a practical way to try learn more data vis and web dev.
+Currently, most back-end stuff and a lot of front-end things are done.
+Next goal is to keep working on the individual track pages and improve the graphs.
 
 ## High-level Goals
 See `todo.md` for more specific stuff.
