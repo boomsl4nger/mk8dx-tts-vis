@@ -178,9 +178,10 @@ def determine_wrs(cc: str, items: str, values_only: bool = True) -> DataFrame | 
     }
 
     key = (cc.upper(), items.upper())
-    if values_only:
-        return wrs_map.get(key, None)[1].values
-    return wrs_map.get(key, None)
+    df = wrs_map.get(key, None)
+    if df is not None and values_only:
+        return df[1].values
+    return df
 
 def calculate_standard(time: TrackTime, standards: list, names: list = None) -> tuple:
     """Calculate which Standard (rank) a given time falls in based on the given cut-off times. For
@@ -245,7 +246,11 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
     timesheet = []
     for num in range(len(tracks)):
         tr_name = tracks[num]
-        wr_time = TrackTime(wrs[num])
+
+        wr_time, wr_num, wr_diff, diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+        if wrs is not None:
+            wr_time = TrackTime(wrs[num])
+            wr_num = wr_time.get_seconds()
 
         try:
             TrackTime(pbs[num])
@@ -253,13 +258,15 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
             timesheet.append([
                 num + 1, tr_name, np.NaN, np.NaN,
                 np.NaN, np.NaN, np.NaN, np.NaN,
-                wr_time, wr_time.get_seconds(), np.NaN, np.NaN, 0
+                wr_time, wr_num, wr_diff, diff_num, 0
             ])
             continue
 
         row = []
         pb_time = TrackTime(pbs[num])
-        wr_diff = pb_time - wr_time
+        if wrs is not None:
+            wr_diff = pb_time - wr_time
+            diff_num = wr_diff.get_seconds()
 
         # Calculate standards
         stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.NaN, np.NaN, np.NaN, np.NaN
@@ -270,7 +277,7 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
         row = [
             num + 1, tr_name, pb_time, pb_time.get_seconds(),
             stnd_name, stnd_arg, stnd_diff, stnd_diff_num,
-            wr_time, wr_time.get_seconds(), wr_diff, wr_diff.get_seconds()
+            wr_time, wr_num, wr_diff, diff_num
         ]
         row.append(round(row[-1] / row[-3] * 100, 5)) # WRDiffNorm
         timesheet.append(row)
@@ -417,9 +424,10 @@ def calculate_sheet_stats(sheet: DataFrame, verbose: bool = False) -> dict | Non
     # Other stats
     diff_avg = sheet["WRDiffNum"].mean()
     diff_med = sheet["WRDiffNum"].median()
-    stats["Diff Average"] = (diff_avg, TrackTime._format_seconds(diff_avg))
-    stats["Diff Median"] = (diff_med, TrackTime._format_seconds(diff_med))
-    stats["Diff Std Dev"] = TrackTime._format_seconds(sheet["WRDiffNum"].std())
+    if not np.isnan(diff_avg):
+        stats["Diff Average"] = (diff_avg, TrackTime._format_seconds(diff_avg))
+        stats["Diff Median"] = (diff_med, TrackTime._format_seconds(diff_med))
+        stats["Diff Std Dev"] = TrackTime._format_seconds(sheet["WRDiffNum"].std())
 
     if verbose:
         print(stats)
