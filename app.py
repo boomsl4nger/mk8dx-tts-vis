@@ -1,7 +1,5 @@
-from flask import Flask, flash, redirect, render_template, request, url_for
-from markupsafe import escape
+from flask import Flask, redirect, render_template, request, url_for
 import numpy as np
-import pandas as pd
 
 import db
 from timesheet import *
@@ -69,23 +67,27 @@ def track():
 
     if not track_name:
         raise ValueError(f"Track name is invalid: {track_name}")
-    
-    track_abbrev = db.query_db("SELECT tr_abbrev FROM tracks WHERE tr_name = ?", (track_name,), one=True)[0]
-    wr_df = determine_wrs(selected_cc, selected_items, values_only=False)
-    if wr_df is not None:
-        wr_time = wr_df.loc[wr_df[0] == track_name][1].values[0]
-        wr_pair = [wr_time, TrackTime(wr_time).get_seconds()]
-    else:
-        wr_pair = [None, None]
 
-    # Fetch times from db for specific combination
+    # Get more track info
+    tr_num, tr_abbrev = db.query_db("SELECT tr_number, tr_abbrev FROM tracks WHERE tr_name = ?", (track_name,), one=True)
+
+    # Determine the WR
+    wr_df = determine_wrs(selected_cc, selected_items)
+    wr_str = wr_df[tr_num] if wr_df is not None else None
+
+    # Fetch PB times from db for specific combination
     times = db.get_times_for_track(track_name, selected_cc, selected_items)
     df = create_track_times_df([row["time_sec"] for row in times])
     df["RowId"] = [row["id"] for row in times]
 
+    # Timesheet excerpt
+    pb = times[0]["time_str"] if len(times) > 0 else None
+    ts_excerpt = create_ts_excerpt_df(tr_num, track_name, pb, wr_str, selected_cc, selected_items)
+
     return render_template("track.html",
-        track_name=track_name, track_abbrev=track_abbrev,
-        times=df.to_dict(orient="records"), wr=wr_pair,
+        track_name=track_name, track_abbrev=tr_abbrev,
+        times=df.to_dict(orient="records"), wr=[wr_str, TrackTime(wr_str).get_seconds() if wr_str else None],
+        ts_excerpt=ts_excerpt.to_dict(orient="records"),
         selected_cc=selected_cc, selected_items=selected_items,
         cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 

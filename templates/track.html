@@ -34,6 +34,38 @@
         <button type="submit" class="btn btn-primary">Filter</button>
     </form>
 
+    <!-- Timesheet excerpt -->
+    <div class="row">
+        <table class="table hover compact" id="tsExcerpt">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Track</th>
+                    <th>Time</th>
+                    <th>Standard</th>
+                    <th>To Next</th>
+                    <th>WR</th>
+                    <th>Diff</th>
+                    <th>Diff (Norm)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in ts_excerpt %}
+                <tr>
+                    <td>{{ row.TrackNo }}</td>
+                    <td>{{ row.TrackName }}</td>
+                    <td>{{ row.Time }}</td>
+                    <td class="colour-rank" data-sort="{{ row.StandardNum }}">{{ row.Standard }}</td>
+                    <td>{{ row.StandardDiff }}</td>
+                    <td>{{ row.WR }}</td>
+                    <td class="colour-diff" data-sort="{{ row.WRDiffNum }}">{{ row.WRDiff }}</td>
+                    <td>{{ "%.3f"|format(row.WRDiffNorm) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     <div class="row">
         <div class="col-md-8">
             <!-- Chart -->

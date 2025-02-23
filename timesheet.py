@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame, Series
 import seaborn as sns
-from typing import Literal
 
 from outreach import fetch_wrs_shrooms
 from TrackTime import TrackTime, TrackTimeExt
@@ -102,7 +101,7 @@ def basic_analysis(data: DataFrame, verbose: bool = False):
         print("\nDescriptive statistics:")
         print(data.describe())
 
-def update_wr_csv(cc: Literal["150cc", "200cc"] = "150cc", path: str = None):
+def update_wr_csv(cc: str = "150cc", path: str = None):
     """Updates the current WR CSV file by pulling the latest times and saving to a new file. If no
     filename is given, creates one by default with the format:
     - `[cc]_wrs_[DD_MM_YYYY].csv`
@@ -113,6 +112,9 @@ def update_wr_csv(cc: Literal["150cc", "200cc"] = "150cc", path: str = None):
         cc (str, optional): CC for WRs. Defaults to 150cc.
         path (str, optional): File path to use when writing. Defaults to None.
     """
+    if cc not in CC_CATEGORIES:
+        raise ValueError(f"Args not recognised: {cc}")
+
     if path is None:
         date_part = datetime.now().strftime("%d_%m_%Y")
         path = f"data/{cc}_wrs_{date_part}.csv"
@@ -283,6 +285,62 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
         timesheet.append(row)
 
     return DataFrame(timesheet, columns=column_names)
+
+def create_ts_excerpt_df(num: int, track: str, pb: str, wr: str, cc: str, items: str) -> DataFrame:
+    """Create only a single row of the timesheet for an individual track. See `create_timesheet_df`
+    for more.
+
+    Args:
+        num (int): Track number.
+        track (str): Track name.
+        pb (str): PB.
+        wr (str): WR.
+        cc (str): CC.
+        items (str): Item type.
+
+    Returns:
+        DataFrame: The timesheet row.
+    """
+    column_names = [
+        "TrackNo", "TrackName", "Time", "TimeNum",
+        "Standard", "StandardNum", "StandardDiff", "StandardDiffNum",
+        "WR", "WRNum", "WRDiff", "WRDiffNum", "WRDiffNorm"
+    ]
+    standards = determine_standards(cc, items)
+    
+    wr_time, wr_num, wr_diff, diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+    if wr is not None:
+        wr_time = TrackTime(wr)
+        wr_num = wr_time.get_seconds()
+
+    try:
+        pb_time = TrackTime(pb)
+    except (ValueError, TypeError) as e: # Time is not valid, and likely empty
+        row = [
+            num, track, np.NaN, np.NaN,
+            np.NaN, np.NaN, np.NaN, np.NaN,
+            wr_time, wr_num, wr_diff, diff_num, 0
+        ]
+        return DataFrame([row], columns=column_names)
+
+    if wr is not None:
+        wr_diff = pb_time - wr_time
+        diff_num = wr_diff.get_seconds()
+
+    # Calculate standards
+    stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+    if standards is not None:
+        stnd_arg, stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num - 1][1:])
+        stnd_diff_num = stnd_diff.get_seconds()
+
+    row = [
+        num, track, pb_time, pb_time.get_seconds(),
+        stnd_name, stnd_arg, stnd_diff, stnd_diff_num,
+        wr_time, wr_num, wr_diff, diff_num
+    ]
+    row.append(round(row[-1] / row[-3] * 100, 5)) # WRDiffNorm
+
+    return DataFrame([row], columns=column_names)
 
 def create_timesheet_df_old(pbs: DataFrame, wrs: DataFrame, standards: DataFrame | None = None) -> DataFrame:
     """NOTE: this function is deprecated. Please see `create_timesheet_df` instead.
