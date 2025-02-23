@@ -1,12 +1,21 @@
 import { rankColormap, getWRDiffColor, tintColor } from "./colour_utils.js";
 
+const wrBarColors = diff_labels.map(label => {
+    let diff = parseFloat(label);
+    return getWRDiffColor(diff);
+});
+
+const rankColors = rank_labels.map(rank => rankColormap.get(rank) || "#CCCCCC"); // Default gray if not found
+
 // Charts
 const wrDiffCtx = document.getElementById('wrDiffChart').getContext('2d');
 const wrDiffData = {
     labels: diff_labels,
     datasets: [{
         label: 'WR Diff Distribution',
-        data: diff_data
+        data: diff_data,
+        backgroundColor: wrBarColors,
+        borderColor: wrBarColors
     }]
 };
 
@@ -27,7 +36,9 @@ const rankData = {
     labels: rank_labels,
     datasets: [{
         label: 'Rank Distribution',
-        data: rank_data
+        data: rank_data,
+        backgroundColor: rankColors,
+        borderColor: rankColors
     }]
 };
 
