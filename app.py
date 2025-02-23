@@ -72,8 +72,8 @@ def track():
     tr_num, tr_abbrev = db.query_db("SELECT tr_number, tr_abbrev FROM tracks WHERE tr_name = ?", (track_name,), one=True)
 
     # Determine the WR
-    wr_df = determine_wrs(selected_cc, selected_items)
-    wr_str = wr_df[tr_num] if wr_df is not None else None
+    wr_list = determine_wrs(selected_cc, selected_items)
+    wr_str = wr_list[tr_num - 1] if wr_list is not None else None
 
     # Fetch PB times from db for specific combination
     times = db.get_times_for_track(track_name, selected_cc, selected_items)

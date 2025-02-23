@@ -15,12 +15,12 @@ Moved out of the readme.
     - Add codes to table
     - Think of a better overall metric
 - Specific track pages
-    - Add row from timesheet for convenience
     - Show ranks on graph
 - Add like the entire track picker page lmao
 - Home page
     - Glossary
     - Better links
+- Clean up code in general, improve doco, etc.
 
 ## Future considerations
 - Support for NITA times, WRs
