@@ -2,29 +2,21 @@
 Moved out of the readme.
 
 ## Main TODO
-- Handle negative diffs (e.g. edge case where user has a time lower than given wr)
-- Add a dummy times sheet for messing around with, rand diff wr + 1-12s
-- Timesheet improvements
-    - Add codes to table
-    - Think of a better overall metric
-- Specific track pages
-    - Show ranks on graph
-- Home page
-    - Glossary
-    - Better links
-- Support for NITA times, WRs
+- Fix the WR getter using dupes and remove total row
+- Support for NITA WRs (hard)
+- Support for 200cc standards
 - Support for best splits
-- Add like the entire track picker page lmao
+- Add like the entire track randomiser page lmao
+- Add page for convenient track selection
 - Track and cup images (urgggghhh)
-    - Add page for convenient track selection
     - https://www.mariowiki.com/Category:Mario_Kart_8_/_Mario_Kart_8_Deluxe_course_icons
     - https://www.mariowiki.com/Gallery:Mario_Kart_8
     - https://www.mariowiki.com/Gallery:Mario_Kart_8_Deluxe
 - Style the components with the bootstrap grid properly, you bot (NO)
-- Style the charts better, palettes and stuff (mmm reading)
 - Clean up code in general, improve doco, etc.
 
 ## Future considerations
+- Redo TrackTime class(es), probably better to just use floats rather than timedeltas
 - Get WR video and other info when looking at specific track pages
 - File upload support for timesheets as CSVs
 - Colourblind support would be cool (toggle cividis for standards?)
