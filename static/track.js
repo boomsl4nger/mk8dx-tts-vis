@@ -27,6 +27,7 @@ const wrDataset = {
 };
 
 // Function to create rank band annotations
+// See: https://www.chartjs.org/chartjs-plugin-annotation/latest/samples/box/quarters.html
 function getRankAnnotations(chart) {
     const yScale = chart.scales.y;
     const yMin = yScale.min;
@@ -44,8 +45,17 @@ function getRankAnnotations(chart) {
             type: 'box',
             yMin: Math.max(cutoffLow, yMin),
             yMax: Math.min(cutoffHigh, yMax),
-            backgroundColor: tintColor(rankColormap.get(standardsNames[i]), 20),
-            borderWidth: 0
+            backgroundColor: tintColor(rankColormap.get(standardsNames[i]), 40),
+            borderWidth: 0,
+            label: {
+                drawTime: 'afterDraw',
+                display: true,
+                content: standardsNames[i],
+                position: {
+                  x: 'start',
+                  y: 'center'
+                }
+              }
         });
     }
 
