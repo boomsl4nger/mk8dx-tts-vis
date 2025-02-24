@@ -32,6 +32,7 @@
             <tr>
                 <th>#</th>
                 <th>Track</th>
+                <th>Code</th>
                 <th>Time</th>
                 <th>Standard</th>
                 <th>To Next</th>
@@ -49,6 +50,7 @@
                         {{ row.TrackName }}
                     </a>
                 </td>
+                <td>{{ row.Code }}</td>
                 <td data-sort="{{ row.TimeNum }}">{{ row.Time }}</td>
                 <td class="colour-rank" data-sort="{{ row.StandardNum }}">{{ row.Standard }}</td>
                 <td data-sort="{{ row.StandardDiffNum }}">{{ row.StandardDiff }}</td>

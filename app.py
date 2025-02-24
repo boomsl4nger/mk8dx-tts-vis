@@ -8,6 +8,7 @@ app = Flask(__name__)
 
 TRACKS = [(row["tr_name"], row["tr_abbrev"]) for row in db.get_tracks()]
 TRACK_NAMES = [i[0] for i in TRACKS]
+TRACK_CODES = [i[1] for i in TRACKS]
 
 @app.route("/")
 def index():
@@ -22,6 +23,7 @@ def timesheet():
     pbs = [row["time_str"] for row in db.get_best_times(selected_cc, selected_items)]
     wrs = determine_wrs(selected_cc, selected_items)
     times_df = create_timesheet_df(TRACK_NAMES, pbs, wrs, selected_cc, selected_items)
+    times_df["Code"] = TRACK_CODES
     overall_stats = calculate_sheet_stats(times_df)
 
     # Make arguments for chart generation

@@ -48,6 +48,7 @@ function getRankAnnotations(chart) {
             backgroundColor: tintColor(rankColormap.get(standardsNames[i]), 40),
             borderWidth: 0,
             label: {
+                // See: https://www.chartjs.org/chartjs-plugin-annotation/latest/guide/types/box.html#label
                 drawTime: 'afterDraw',
                 display: true,
                 content: standardsNames[i],
@@ -167,8 +168,8 @@ document.addEventListener("DOMContentLoaded", function() {
         ordering: false,
         columnDefs: [
             { className: "dt-head-left", targets: "_all" },
-            { className: "dt-body-center", targets: [2, 3, 4, 5, 6, 7] },
-            { width: "11%", targets: [2, 3, 4, 5, 6, 7] }
+            { className: "dt-body-center", targets: [3, 4, 5, 6, 7, 8] },
+            { width: "11%", targets: [3, 4, 5, 6, 7, 8] }
         ]
     });
 
