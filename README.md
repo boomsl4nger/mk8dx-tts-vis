@@ -19,7 +19,7 @@ The application is built using Flask, which is run with the following command:
 ```
 python -m flask run
 ```
-Once running, the application should be running on [localhost:5000](http://127.0.0.1:5000/).
+The application should be running on [localhost:5000](http://127.0.0.1:5000/).
 Append `--debug` to run in debug mode.
 
 It is strongly recommended to be working in a virtual environment. This is made pretty simple by running the following commands:
