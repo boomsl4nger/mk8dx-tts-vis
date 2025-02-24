@@ -1,4 +1,4 @@
-import { rankColormap, getWRDiffColor, tintColor } from "./colour_utils.js";
+import { rankColormap, getWRDiffColor } from "./colour_utils.js";
 
 const wrBarColors = diff_labels.map(label => {
     let diff = parseFloat(label);
@@ -25,6 +25,11 @@ new Chart(wrDiffCtx, {
     options: {
         responsive: true,
         aspectRatio: 1.4,
+        plugins: {
+            legend: {
+                onClick: null
+            }  
+        },
         scales: {
             y: { beginAtZero: true }
         }
@@ -48,6 +53,11 @@ new Chart(rankCtx, {
     options: {
         responsive: true,
         aspectRatio: 1.4,
+        plugins: {
+            legend: {
+                onClick: null
+            }  
+        },
         indexAxis: 'y', // Vertical bar chart
         scales: {
             x: { beginAtZero: true }
