@@ -1,4 +1,4 @@
-import { standardsNames, rankColormap, getWRDiffColor, tintColor } from "./colour_utils.js";
+import { standardsNames, WRColor, rankColormap, getWRDiffColor, tintColor } from "./colour_utils.js";
 
 let showRankBands = false;
 
@@ -18,9 +18,9 @@ const pbDataset = {
 const wrDataset = {
     label: 'WR',
     data: wrData,
-    borderColor: "red",
-    borderWidth: 2,
-    borderDash: [10, 5],
+    borderColor: WRColor,
+    borderDash: [20, 6],
+    borderWidth: 3,
     pointRadius: 0,
     pointHoverRadius: 0,
     hidden: true  

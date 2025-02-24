@@ -12,6 +12,8 @@ export const standardsNames = [
     "Beg A", "Beg B", "Beg C"
 ];
 
+export const WRColor = "rgb(251, 192, 45)";
+
 // Generate color mapping
 export const rankColormap = new Map();
 standardsNames.forEach((rank, i) => {
