@@ -34,7 +34,7 @@ function getRankAnnotations(chart) {
     const yMax = yScale.max;
     let annotations = [];
 
-    for (let i = 0; i < standards.length - 1; i++) {
+    for (let i = 0; i < standards.length; i++) {
         let cutoffLow = standards[i - 1] || 0.0;
         let cutoffHigh = standards[i];
 
