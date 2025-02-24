@@ -56,9 +56,6 @@ def init_db():
     conn.commit()
     close_db(conn)
 
-    # Populate tracks table
-    init_tracks_from_csv(tracks_path)
-
 def init_tracks_from_csv(path: str):
     """Insert track information into the table given a CSV file path.
 
@@ -79,13 +76,13 @@ def init_tracks_from_csv(path: str):
 def init_times_from_csv(path: str, cc: str = "150cc", items: str = "Shrooms"):
     """Insert some preset times into the time table in the db given a CSV file path.
 
+    The CSV file should have rows in the following format: `track_name, time_str`.
+    For example: `Mario Kart Stadium, 1:40.000`
+
     Args:
         path (str): CSV file path.
         cc (str, optional): CC. Defaults to "150cc".
         items (str, optional): Item type. Defaults to "Shrooms".
-
-    Raises:
-        ValueError: _description_
     """
     if cc not in CC_CATEGORIES or items not in ITEM_OPTIONS:
         raise ValueError(f"Invalid CC or item type: {cc} | {items}")
@@ -94,6 +91,23 @@ def init_times_from_csv(path: str, cc: str = "150cc", items: str = "Shrooms"):
     with open(path) as f:
         r = csv.reader(f)
         times = [(row[0], row[1], TrackTime(row[1]).get_seconds(), cc, items) for row in r]
+        conn.executemany(
+            "INSERT INTO track_times (track, time_str, time_sec, cc, items) VALUES (?, ?, ?, ?, ?)", 
+            times
+        )
+    conn.commit()
+    close_db(conn)
+
+def init_dummy_times(path: str):
+    """Insert randomly generated dummy times into the db given a CSV file path.
+
+    Args:
+        path (str): CSV file path.
+    """
+    conn = get_db()
+    with open(path) as f:
+        r = csv.reader(f)
+        times = [(row[0], row[1], TrackTime(row[1]).get_seconds(), row[2], row[3]) for row in r]
         conn.executemany(
             "INSERT INTO track_times (track, time_str, time_sec, cc, items) VALUES (?, ?, ?, ?, ?)", 
             times
@@ -139,6 +153,7 @@ def delete_time(id: str):
     conn.commit()
     close_db(conn)
 
+#region Get queries
 def get_tracks() -> tuple:
     """Get all rows from the tracks table in the db.
 
@@ -210,18 +225,21 @@ def get_times_for_track(name: str, cc: str, items: str) -> tuple:
         ORDER BY time_sec
     """
     return query_db(query, (name, cc, items))
+#endregion
 
 if __name__ in "__main__":
     # Caution: running this file directly will initialise the database
     tracks_path = "data/track_names.csv"
-    times_path = "data/150cc_times.csv"
+    dummy_times_path = "data/times_dummy_data.csv"
+    times_path = "data/times_data_file_here"
 
-    # Uncomment the following if you want to re-init the db
-    # init_db()
+    # Uncomment the following if you want to re-init the db and the tracks table
+    init_db()
+    print("DB initialised.")
+    init_tracks_from_csv(tracks_path)
+    print("Track table populated.")
+
+    # These functions can be swapped to use dummy data or not
+    init_dummy_times(dummy_times_path)
     # init_times_from_csv(times_path)
-
-    # Otherwise, used for debugging stuff
-    # print([row["time_str"] for row in get_best_times("200cc", "Shrooms")])
-    # print([[j for j in i] for i in get_recent_times(n="3")])
-    # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
-    # print(insert_time("Water Park", "1:47.000", "150cc", "Shrooms"))
+    print("Times table populated.")

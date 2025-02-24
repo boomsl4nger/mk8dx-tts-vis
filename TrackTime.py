@@ -57,11 +57,13 @@ class TrackTime:
         """Converts a time float in seconds to a formatted string.
 
         Args:
-            s (float): Time (seconds).
+            s (float): Time (seconds). Should be a positive float.
 
         Returns:
             str: Formatted time string.
         """
+        if s < 0:
+            raise ValueError(f"Time should be positive.")
         return TrackTime._format_timedelta(timedelta(seconds=s))
     
     def _ensure_track_time(self, other):

@@ -578,19 +578,14 @@ def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_
 
 if __name__ in "__main__":
     # Update WR CSVs
-    # update_wr_csv("150cc")
-    # update_wr_csv("200cc")
-
-    # Example usage: create 150cc shrooms timesheet
-    times_150 = pd.read_csv("data/150cc_times.csv", header=None)
-    wrs_150 = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
-    track_names = times_150[0].values
-    timesheet = create_timesheet_df(track_names, times_150[1].values, wrs_150[1].values, STANDARDS_150_SHROOMS)
+    update_wr_csv("150cc")
+    update_wr_csv("200cc")
 
     # Testing standard diff calcs
     # print(calculate_standard("1:01.010", ["0:55.000", "1:01.000"], ["A", "B"]))
 
-    # Do stuff with it
+    # Example timesheet usage
+    # timesheet = create_timesheet_df(...)
     # basic_analysis(timesheet)
     # print(top_n_times(timesheet, col="WRDiffNum", n=10, bottom=False))
     # calculate_sheet_stats(timesheet, verbose=True)
