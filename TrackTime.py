@@ -89,6 +89,9 @@ class TrackTime:
 
     def __sub__(self, other):
         other = self._ensure_track_time(other)
+        if self.time < other.time:
+            # TODO this is a bit jank
+            return TrackTime("0:00.000")
         return TrackTime(self._format_timedelta(self.time - other.time))
 
     def __eq__(self, other):
