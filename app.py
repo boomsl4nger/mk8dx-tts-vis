@@ -83,11 +83,14 @@ def track():
     # Timesheet excerpt
     pb = times[0]["time_str"] if len(times) > 0 else None
     ts_excerpt = create_ts_excerpt_df(tr_num, track_name, pb, wr_str, selected_cc, selected_items)
+    standards = determine_standards(selected_cc, selected_items)
+    if standards is not None:
+        standards = [TrackTime(i).get_seconds() for i in standards.iloc[tr_num - 1][1:]]
 
     return render_template("track.html",
         track_name=track_name, track_abbrev=tr_abbrev,
         times=df.to_dict(orient="records"), wr=[wr_str, TrackTime(wr_str).get_seconds() if wr_str else None],
-        ts_excerpt=ts_excerpt.to_dict(orient="records"),
+        ts_excerpt=ts_excerpt.to_dict(orient="records"), standards=standards if standards else [],
         selected_cc=selected_cc, selected_items=selected_items,
         cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 

@@ -1,36 +1,65 @@
-import { rankColormap, getWRDiffColor, tintColor } from "./colour_utils.js";
+import { standardsNames, rankColormap, getWRDiffColor, tintColor } from "./colour_utils.js";
+
+let showRankBands = false;
+
+// PB Progression Line
+const pbDataset = {
+    label: 'PB Progression',
+    data: timesSec,
+    borderColor: '#36A2EB',
+    backgroundColor: '#9BD0F5',
+    tension: 0.05,
+    pointRadius: 6,
+    pointHoverRadius: 10,
+    fill: false
+};
+
+// WR Line
+const wrDataset = {
+    label: 'WR',
+    data: wrData,
+    borderColor: "red",
+    borderWidth: 2,
+    borderDash: [10, 5],
+    pointRadius: 0,
+    pointHoverRadius: 0,
+    hidden: true  
+};
+
+// Function to create rank band annotations
+function getRankAnnotations(chart) {
+    const yScale = chart.scales.y;
+    const yMin = yScale.min;
+    const yMax = yScale.max;
+    let annotations = [];
+
+    for (let i = 0; i < standards.length - 1; i++) {
+        let cutoffLow = standards[i - 1] || 0.0;
+        let cutoffHigh = standards[i];
+
+        if (cutoffHigh < yMin) continue;
+        if (cutoffLow > yMax) break;
+
+        annotations.push({
+            type: 'box',
+            yMin: Math.max(cutoffLow, yMin),
+            yMax: Math.min(cutoffHigh, yMax),
+            backgroundColor: tintColor(rankColormap.get(standardsNames[i]), 20),
+            borderWidth: 0
+        });
+    }
+
+    return annotations;
+}
 
 // Improvement chart
 const ctx = document.getElementById('timeProgressChart').getContext('2d');
-const timeData = {
-    labels: indices.length > 1 ? indices : wrLabels,
-    datasets: [
-        { // PB lines
-            label: 'PB Progression',
-            data: timesSec,
-            borderColor: '#36A2EB',
-            backgroundColor: '#9BD0F5',
-            // stepped: true,
-            tension: 0.05,
-            pointRadius: 6,
-            pointHoverRadius: 10,
-            fill: false,
-        },
-        { // WR line
-            label: 'WR',
-            data: wrData,
-            borderColor: "red",
-            borderWidth: 2,
-            borderDash: [10, 5],
-            pointRadius: 0,
-            hidden: true  // Initially hidden
-        }
-    ]
-};
-
 const timeChart = new Chart(ctx, {
-    type: 'line',
-    data: timeData,
+    type: "line",
+    data: {
+        labels: indices.length > 1 ? indices : wrLabels,
+        datasets: [pbDataset, wrDataset]
+    },
     options: {
         responsive: true,
         plugins: {
@@ -41,15 +70,23 @@ const timeChart = new Chart(ctx, {
                         if (tooltipItem.datasetIndex === 0) {
                             const index = tooltipItem.dataIndex;
                             return `${timesStr[index]} (${timesSec[index].toFixed(3)})`;
-                        } else { return null; }
+                        }
+                        return null;
                     }
                 }
+            },
+            legend: {
+                onClick: null
+            },
+            annotation: { // Rank bands
+                common: { drawTime: 'beforeDraw' },
+                annotations: []
             }
         },
-        interaction: {
-            intersect: false,
-            mode: 'index',
-        },
+        // interaction: {
+        //     intersect: false,
+        //     mode: 'index',
+        // },
         scales: {
             x: {
                 title: {
@@ -70,20 +107,45 @@ const timeChart = new Chart(ctx, {
     }
 });
 
+// Function to update rank bands dynamically
+function updateRankBands() {
+    if (showRankBands) {
+        timeChart.options.plugins.annotation.annotations = getRankAnnotations(timeChart);
+    } else {
+        timeChart.options.plugins.annotation.annotations = [];
+    }
+    timeChart.update();
+}
+
 // Toggle WR line visibility
 document.getElementById("toggleWR").addEventListener("click", function() {
     let wrDataset = timeChart.data.datasets[1];
     wrDataset.hidden = !wrDataset.hidden;
+    showRankBands = !showRankBands;
+    updateRankBands();
+    timeChart.update();
+
+    showRankBands = !showRankBands;
+    updateRankBands();
     timeChart.update();
 });
 
-// Toggle WR line visibility
+// Toggle log-scale
 document.getElementById("toggleScale").addEventListener("click", function() {
-    let curScale = timeChart.options.scales.y;
-    if ( curScale.type == "linear" ) {
-        curScale.type = "logarithmic";
-    } else { curScale.type = "linear"; }
+    let yScale = timeChart.options.scales.y;
+    if ( yScale.type == "linear" ) {
+        yScale.type = "logarithmic";
+    } else { yScale.type = "linear"; }
+
+    // yScale.beginAtZero = !yScale.beginAtZero
+
     timeChart.update();
+});
+
+// Toggle Rank Bands Button
+document.getElementById("toggleRankBands").addEventListener("click", function () {
+    showRankBands = !showRankBands;
+    updateRankBands();
 });
 
 document.addEventListener("DOMContentLoaded", function() {

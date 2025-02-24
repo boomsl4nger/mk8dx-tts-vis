@@ -89,6 +89,7 @@
 
             <!-- Toggle chart features -->
             <button id="toggleWR" class="btn btn-outline-secondary">Toggle WR Line</button>
+            <button id="toggleRankBands" class="btn btn-outline-secondary">Toggle Rank Bands</button>
             <button id="toggleScale" class="btn btn-outline-secondary">Toggle Log Scale</button>
         </div>
         <div class="col-md-4">
@@ -132,26 +133,26 @@
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        const times = {{ times | tojson | safe }}
-        const indices = times.map(t => t.Num);
-        const timesStr = times.map(t => t.Time).reverse();
-        const timesSec = times.map(t => t.TimeNum).reverse();
+<script>
+    const times = {{ times | tojson | safe }}
+    const indices = times.map(t => t.Num);
+    const timesStr = times.map(t => t.Time).reverse();
+    const timesSec = times.map(t => t.TimeNum).reverse();
 
-        const wrSec = {{ wr[1] | tojson }};
-        const wrStr = {{ wr[0] | tojson }};
+    const wrSec = {{ wr[1] | tojson }};
+    const wrStr = {{ wr[0] | tojson }};
 
-        let wrLabels = [...indices];
-        let wrData = indices.map(() => wrSec);
+    const standards = {{ standards | tojson }};
 
-        if (wrLabels.length < 2) {
-            // If less than one data point, add a fake point to draw the wr line
-            wrLabels = [1, 2];
-            wrData = [wrSec, wrSec];
-        }
-        console.log(indices)
-        console.log(wrLabels)
-    </script>
-    <script type="module" src="{{ url_for('static', filename='track.js') }}"></script>
-    <script src="{{ url_for('static', filename='delete_time.js') }}"></script>
+    let wrLabels = [...indices];
+    let wrData = indices.map(() => wrSec);
+
+    if (wrLabels.length < 2) {
+        // If less than one data point, add a fake point to draw the wr line
+        wrLabels = [1, 2];
+        wrData = [wrSec, wrSec];
+    }
+</script>
+<script type="module" src="{{ url_for('static', filename='track.js') }}"></script>
+<script src="{{ url_for('static', filename='delete_time.js') }}"></script>
 {% endblock %}
