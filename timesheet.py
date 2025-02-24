@@ -19,14 +19,14 @@ sns.set_theme(style="whitegrid")
 CC_CATEGORIES = ["150cc", "200cc"]
 ITEM_OPTIONS = ["Shrooms", "NITA"]
 
-WRS_150_SHROOMS = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
-WRS_200_SHROOMS = pd.read_csv("data/200cc_wrs_03_02_2025.csv", header=None)
+WRS_150_SHROOMS = pd.read_csv("data/150cc_wrs_24_02_2025.csv", header=None)
+WRS_200_SHROOMS = pd.read_csv("data/200cc_wrs_24_02_2025.csv", header=None)
 WRS_150_NITA = None
 WRS_200_NITA = None
 
 STANDARDS_150_SHROOMS = pd.read_csv("data/150cc_standards.csv")
 STANDARDS_200_SHROOMS = None
-STANDARDS_150_NITA = None
+STANDARDS_150_NITA = pd.read_csv("data/150cc_nita_standards.csv")
 STANDARDS_200_NITA = None
 STANDARDS_NAMES = [
     'God', 'Myth A', 'Myth B', 'Myth C', 'Titan A', 'Titan B', 'Titan C', 
@@ -63,8 +63,10 @@ def raw_to_csv(input_filename: str, output_filename: str):
 def clean_standards(filename: str):
     """Specialised to clean the raw CSV download from original Google Sheets page.
 
+    NOTE: currently overwrites the given file with the cleaned version!
+
     Args:
-        filename (str): Filename.
+        filename (str): Path to file to clean.
     """
     df = pd.read_csv(filename)
     df.drop(["Cup", "WR", "-"], axis=1, inplace=True)
@@ -260,7 +262,7 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
             timesheet.append([
                 num + 1, tr_name, np.NaN, np.NaN,
                 np.NaN, np.NaN, np.NaN, np.NaN,
-                wr_time, wr_num, wr_diff, diff_num, 0
+                wr_time, wr_num, wr_diff, diff_num, np.NaN
             ])
             continue
 
@@ -576,10 +578,10 @@ def create_visuals_track(timesheet: DataFrame, standards: DataFrame = STANDARDS_
 
 if __name__ in "__main__":
     # Update WR CSVs
-    # update_wr_csv("150")
-    # update_wr_csv("200")
+    # update_wr_csv("150cc")
+    # update_wr_csv("200cc")
 
-    # Create timesheet
+    # Example usage: create 150cc shrooms timesheet
     times_150 = pd.read_csv("data/150cc_times.csv", header=None)
     wrs_150 = pd.read_csv("data/150cc_wrs_03_02_2025.csv", header=None)
     track_names = times_150[0].values
@@ -589,9 +591,6 @@ if __name__ in "__main__":
     # print(calculate_standard("1:01.010", ["0:55.000", "1:01.000"], ["A", "B"]))
 
     # Do stuff with it
-    # print(timesheet.head(10))
     # basic_analysis(timesheet)
     # print(top_n_times(timesheet, col="WRDiffNum", n=10, bottom=False))
     # calculate_sheet_stats(timesheet, verbose=True)
-    # create_visuals_overall(timesheet)
-    # create_visuals_track(timesheet, track_name="Mario Kart Stadium", standards=STANDARDS_150)
