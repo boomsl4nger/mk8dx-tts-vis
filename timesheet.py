@@ -216,7 +216,7 @@ def calculate_standard(time: TrackTime, standards: list, names: list = None) -> 
         if time <= cutoff:
             # Get the previous bound if not already top rank
             rank = names[i]
-            to_next = standards[i-1] if i > 0 else None
+            to_next = standards.iloc[i-1] if i > 0 else None
             diff = time - TrackTime(to_next) if to_next else TrackTime("0:00.000")
             return i+1, rank, diff
     return len(names)+1, "Unranked", time - TrackTime(standards[-1])
@@ -251,7 +251,7 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
     for num in range(len(tracks)):
         tr_name = tracks[num]
 
-        wr_time, wr_num, wr_diff, diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+        wr_time, wr_num, wr_diff, diff_num = np.nan, np.nan, np.nan, np.nan
         if wrs is not None:
             wr_time = TrackTime(wrs[num])
             wr_num = wr_time.get_seconds()
@@ -260,9 +260,9 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
             TrackTime(pbs[num])
         except ValueError: # Time is not valid, and likely empty
             timesheet.append([
-                num + 1, tr_name, np.NaN, np.NaN,
-                np.NaN, np.NaN, np.NaN, np.NaN,
-                wr_time, wr_num, wr_diff, diff_num, np.NaN
+                num + 1, tr_name, np.nan, np.nan,
+                np.nan, np.nan, np.nan, np.nan,
+                wr_time, wr_num, wr_diff, diff_num, np.nan
             ])
             continue
 
@@ -273,7 +273,7 @@ def create_timesheet_df(tracks: list, pbs: list, wrs: list, cc: str, items: str)
             diff_num = wr_diff.get_seconds()
 
         # Calculate standards
-        stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+        stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.nan, np.nan, np.nan, np.nan
         if standards is not None:
             stnd_arg, stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num][1:])
             stnd_diff_num = stnd_diff.get_seconds()
@@ -310,7 +310,7 @@ def create_ts_excerpt_df(num: int, track: str, pb: str, wr: str, cc: str, items:
     ]
     standards = determine_standards(cc, items)
     
-    wr_time, wr_num, wr_diff, diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+    wr_time, wr_num, wr_diff, diff_num = np.nan, np.nan, np.nan, np.nan
     if wr is not None:
         wr_time = TrackTime(wr)
         wr_num = wr_time.get_seconds()
@@ -319,8 +319,8 @@ def create_ts_excerpt_df(num: int, track: str, pb: str, wr: str, cc: str, items:
         pb_time = TrackTime(pb)
     except (ValueError, TypeError) as e: # Time is not valid, and likely empty
         row = [
-            num, track, np.NaN, np.NaN,
-            np.NaN, np.NaN, np.NaN, np.NaN,
+            num, track, np.nan, np.nan,
+            np.nan, np.nan, np.nan, np.nan,
             wr_time, wr_num, wr_diff, diff_num, 0
         ]
         return DataFrame([row], columns=column_names)
@@ -330,7 +330,7 @@ def create_ts_excerpt_df(num: int, track: str, pb: str, wr: str, cc: str, items:
         diff_num = wr_diff.get_seconds()
 
     # Calculate standards
-    stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.NaN, np.NaN, np.NaN, np.NaN
+    stnd_arg, stnd_name, stnd_diff, stnd_diff_num = np.nan, np.nan, np.nan, np.nan
     if standards is not None:
         stnd_arg, stnd_name, stnd_diff = calculate_standard(pb_time, standards.iloc[num - 1][1:])
         stnd_diff_num = stnd_diff.get_seconds()

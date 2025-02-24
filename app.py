@@ -45,7 +45,7 @@ def timesheet():
 
     chart_rank_args = {
         "Labels": STANDARDS_NAMES,
-        "Counts": [rank_counts[rank] for rank in STANDARDS_NAMES],
+        "Counts": [int(rank_counts[rank]) for rank in STANDARDS_NAMES],
     }
 
     return render_template("timesheet.html",
