@@ -2,7 +2,6 @@
 Moved out of the readme.
 
 ## Main TODO
-- Fix the WR getter using dupes and remove total row
 - Support for NITA WRs (hard)
 - Support for 200cc standards
 - Support for best splits

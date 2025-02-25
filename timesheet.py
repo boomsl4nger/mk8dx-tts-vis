@@ -19,8 +19,8 @@ sns.set_theme(style="whitegrid")
 CC_CATEGORIES = ["150cc", "200cc"]
 ITEM_OPTIONS = ["Shrooms", "NITA"]
 
-WRS_150_SHROOMS = pd.read_csv("data/150cc_wrs_24_02_2025.csv", header=None)
-WRS_200_SHROOMS = pd.read_csv("data/200cc_wrs_24_02_2025.csv", header=None)
+WRS_150_SHROOMS = pd.read_csv("data/150cc_wrs_25_02_2025.csv", header=None)
+WRS_200_SHROOMS = pd.read_csv("data/200cc_wrs_25_02_2025.csv", header=None)
 WRS_150_NITA = None
 WRS_200_NITA = None
 

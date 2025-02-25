@@ -52,11 +52,24 @@ python generate_times.py
 ```
 
 ### Updating the WRs
-There are functions to automatically fetch and update the WR CSV files. Currently, this only supports updating the shroom WRs because the website is easier to scrape. The function is in `timesheet.py` and requires a `cc` parameter:
+There are functions to automatically fetch and update the WR CSV files. Currently, this only supports updating the shroom WRs because the website is easier to scrape. The function is in `timesheet.py` and requires a `cc` parameter, for example:
 ```
 python -c "import timesheet as ts; ts.update_wr_csv('150cc')"
 ```
-Furthermore, this is still somewhat buggy when there are WR ties, so some manual correction might be needed to the CSV files. I'd just recommend not updating the WRs for now.
+
+Note that currently NITA WRs and 200cc standards are not supported, so will appear as missing in the timesheet. The Shrooms WRs were last updated 25/02/2025.
+
+## Example Images
+Below are some images of what the project currently looks like!
+
+Timesheet example using dummy data:
+![Timesheet snippet](images/ex_timesheet.png)
+
+Overall statistics for the above timesheet:
+![Overall statistics](images/ex_overall_stats.png)
+
+Individual track page for Tour Madrid Drive (150cc, Shrooms):
+![Individual track stats](images/ex_indiv_track_bands.png)
 
 ## References / Resources
 - https://flask.palletsprojects.com/en/stable/
