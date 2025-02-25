@@ -121,7 +121,12 @@ def update_wr_csv(cc: str = "150cc", path: str = None):
         date_part = datetime.now().strftime("%d_%m_%Y")
         path = f"data/{cc}_wrs_{date_part}.csv"
 
-    times = DataFrame(fetch_wrs_shrooms(cc))
+    times = DataFrame(fetch_wrs_shrooms(cc)[:-1])
+    times.drop_duplicates(inplace=True) # Needed to remove WR ties
+
+    if times.shape[0] != 96: # Ensure the df has all 96 tracks
+        raise ValueError(f"WRs DF has unexpected length: {times.shape}")
+
     times.to_csv(path, header=False, index=False)
 #endregion
 
