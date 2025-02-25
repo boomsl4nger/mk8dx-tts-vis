@@ -57,7 +57,7 @@ There are functions to automatically fetch and update the WR CSV files. Currentl
 python -c "import timesheet as ts; ts.update_wr_csv('150cc')"
 ```
 
-Note that currently NITA WRs and 200cc standards are not supported, so will appear as missing in the timesheet. The Shrooms WRs were last updated 25/02/2025.
+Note that currently NITA WRs and 200cc standards are not supported, so will appear as missing in the timesheet. The Shrooms WRs were last updated 25/02/2025; this isn't *fully* automated just yet, so best not to update the WRs unless you know what you're doing.
 
 ## Example Images
 Below are some images of what the project currently looks like!
@@ -71,18 +71,20 @@ Overall statistics for the above timesheet:
 Individual track page for Tour Madrid Drive (150cc, Shrooms):
 ![Individual track stats](images/ex_indiv_track_bands.png)
 
-## References / Resources
+## License & References
+I'm making this repo public with an MIT license.
+Please credit me if you use any of the code I've written!
+
+General:
 - https://flask.palletsprojects.com/en/stable/
 - https://jinja.palletsprojects.com/en/stable/templates/
 
-### Styling
+Styling:
 - https://getbootstrap.com/
 - https://datatables.net/manual/installation
 - https://select2.org/
 
-### Data viz stuff
+Data viz stuff:
 - https://seaborn.pydata.org/examples/index.html
 - https://www.chartjs.org/docs/latest/
-- https://imagecolorpicker.com/color-code/2596be
-- https://www.npmjs.com/package/colormap
 - https://d3js.org/d3-scale-chromatic
