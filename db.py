@@ -1,7 +1,6 @@
 import csv
 import sqlite3
 from sqlite3 import Connection
-from flask import g
 
 from timesheet import CC_CATEGORIES, ITEM_OPTIONS
 from TrackTime import TrackTime
@@ -20,7 +19,7 @@ def get_db() -> Connection:
     conn.row_factory = sqlite3.Row
     return conn
 
-def close_db(conn: Connection) -> None:
+def close_db(conn: Connection):
     """Close the db connection.
 
     Args:
@@ -47,9 +46,7 @@ def query_db(query: str, args: tuple = (), one: bool = False) -> tuple:
     return (rows[0] if rows else None) if one else rows
 
 def init_db():
-    """Initialise the db based on the schema file.
-    """
-    # Create tables from schema
+    """Initialise the db based on the schema file."""
     conn = get_db()
     with open("schema.sql", "r") as f:
         conn.executescript(f.read())

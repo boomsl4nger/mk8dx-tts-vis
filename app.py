@@ -12,10 +12,12 @@ TRACK_CODES = [i[1] for i in TRACKS]
 
 @app.route("/")
 def index():
+    """Home page"""
     return render_template("index.html")
 
 @app.route("/timesheet", methods=["GET"])
 def timesheet():
+    """Timesheet page. Contains a large table of times data and some overall statistics at the bottom."""
     selected_cc = request.args.get("cc", "150cc")
     selected_items = request.args.get("items", "Shrooms")
 
@@ -57,32 +59,36 @@ def timesheet():
 
 @app.route("/update", methods=["GET"])
 def update():
+    """Update time page. Contains a form for inserting new records into the db."""
     return render_template("update.html",
-        track_names=TRACKS, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS,
-        recent_times=db.get_recent_times("10"))
+        recent_times=db.get_recent_times("10"),
+        track_names=TRACKS, cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 
 @app.route("/track")
 def track():
+    """Individual track page. Contains various useful visualisations of times.
+
+    Raises:
+        ValueError: If the track name is invalid.
+    """
     track_name = request.args.get("track")
     selected_cc = request.args.get("cc", "150cc")
     selected_items = request.args.get("items", "Shrooms")
 
-    if not track_name:
+    if not track_name or track_name not in TRACK_NAMES:
         raise ValueError(f"Track name is invalid: {track_name}")
 
     # Get more track info
     tr_num, tr_abbrev = db.query_db("SELECT tr_number, tr_abbrev FROM tracks WHERE tr_name = ?", (track_name,), one=True)
 
-    # Determine the WR
+    # Fetch WR and PB times
     wr_list = determine_wrs(selected_cc, selected_items)
     wr_str = wr_list[tr_num - 1] if wr_list is not None else None
-
-    # Fetch PB times from db for specific combination
     times = db.get_times_for_track(track_name, selected_cc, selected_items)
     df = create_track_times_df([row["time_sec"] for row in times])
     df["RowId"] = [row["id"] for row in times]
 
-    # Timesheet excerpt
+    # Generate timesheet excerpt
     pb = times[0]["time_str"] if len(times) > 0 else None
     ts_excerpt = create_ts_excerpt_df(tr_num, track_name, pb, wr_str, selected_cc, selected_items)
     standards = determine_standards(selected_cc, selected_items)
@@ -90,23 +96,29 @@ def track():
         standards = [TrackTime(i).get_seconds() for i in standards.iloc[tr_num - 1][1:]]
 
     return render_template("track.html",
+        times=df.to_dict(orient="records"),
+        ts_excerpt=ts_excerpt.to_dict(orient="records"),
+        wr=[wr_str, TrackTime(wr_str).get_seconds() if wr_str else None],
+        standards=standards if standards else [],
         track_name=track_name, track_abbrev=tr_abbrev,
-        times=df.to_dict(orient="records"), wr=[wr_str, TrackTime(wr_str).get_seconds() if wr_str else None],
-        ts_excerpt=ts_excerpt.to_dict(orient="records"), standards=standards if standards else [],
         selected_cc=selected_cc, selected_items=selected_items,
         cc_categories=CC_CATEGORIES, item_options=ITEM_OPTIONS)
 
 @app.route("/picker")
 def picker():
+    """Random track picker page. Not implemented."""
     return render_template("picker.html")
 
 @app.route("/delete/<int:entry_id>", methods=["POST"])
 def delete_time(entry_id):
-    # Extract query parameters before deleting the entry
+    """Delete time from the db.
+
+    Args:
+        entry_id (str): Row ID to remove from the db.
+    """
     track_name = request.form.get("track_name")
     selected_cc = request.form.get("selected_cc", "150cc")
     selected_items = request.form.get("selected_items", "Shrooms")
-
     db.delete_time(entry_id)
 
     if track_name:
@@ -115,6 +127,7 @@ def delete_time(entry_id):
 
 @app.route("/insert_time", methods=["POST"])
 def insert_time():
+    """Insert time into the db."""
     track = request.form.get("track")
     time = request.form.get("time")
     cc = request.form.get("cc", "150cc")
@@ -134,8 +147,6 @@ def insert_time():
     if "track" in referrer:
         return redirect(url_for("track", track=track, cc=cc, items=items, success="true" if success else "false", error=error))
     return redirect(url_for("update", success="true" if success else "false", error=error))
-
-
 
 if __name__ == "__main__":
     app.run(debug=True)
